@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBTree - 澳洲留学生课程评价系统</title>
+    <link rel="icon" href="forum.svg" type="image/svg+xml">
+    <!-- 引入 TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置 Tailwind 主题色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        secondary: '#6366F1', // Indigo-500
+                        surface: '#F9FAFB', // Gray-50
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- 引入图标库 (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* 自定义一些过渡效果 */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        /* 模态框动画 */
+        #loginModal {
+            transition: opacity 0.3s ease;
+        }
+        .hidden-modal {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .visible-modal {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-surface text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- ================= Header ================= -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <!-- Logo -->
+                <div class="flex items-center cursor-pointer" onclick="window.location.reload()">
+                  <img src="forum.svg" alt="IRBTree" class="w-8 h-8 mr-2">
+									<!-- <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white mr-2">
+                        <i class="ph-bold ph-tree-structure text-xl"></i>
+                    </div> -->
+                    <span class="font-bold text-xl tracking-tight text-gray-900">IRBTree Forum</span>
+                </div>
+
+                <!-- Navigation -->
+                <nav class="hidden h-16 md:flex space-x-8">
+                    <a href="#" onclick="switchTab(event, 'home')" id="nav-home" class="nav-item h-16 flex items-center text-primary font-medium border-b-4 border-primary px-1 pt-1 transition">首页</a>
+                    <a href="#" onclick="switchTab(event, 'courses')" id="nav-courses" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">课程列表</a>
+                    <a href="#" onclick="switchTab(event, 'review')" id="nav-review" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">写点评</a>
+                    <a href="#" onclick="switchTab(event, 'profile')" id="nav-profile" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">个人中心</a>
+                </nav>
+
+                <!-- Auth Buttons -->
+                <div class="flex items-center space-x-4" id="authSection">
+                    <!-- 动态渲染区域 -->
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= Main Content ================= -->
+    <main class="flex-grow relative">
+        <div id="view-home" class="tab-content block">
+        <!-- Hero Section & Search -->
+        <div class="bg-white pb-16 pt-12 lg:pt-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mb-4">
+                    拒绝挂科，<span class="text-primary">选课不踩雷</span>
+                </h1>
+                <p class="text-xl text-gray-500 max-w-4xl mx-auto mb-10">
+                    澳洲留学生专属的课程评价平台，查看真实学长学姐评价，查询 GPA 杀手课与水课。
+                </p>
+
+                <!-- Search Bar -->
+                <div class="relative max-w-2xl mx-auto mb-12 group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-gray-400 text-xl"></i>
+                    </div>
+                    <input type="text" 
+                        class="block w-full pl-12 pr-32 py-4 border-2 border-gray-200 rounded-full leading-5 bg-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-indigo-100 sm:text-lg transition shadow-sm group-hover:shadow-md"
+                        placeholder="搜索课程代码 (e.g. COMP9021) 或课程名..."
+                    >
+                    <div class="absolute inset-y-0 right-2 flex items-center">
+                        <button onclick="handleSearch()" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full font-medium transition shadow-md">
+                            搜索
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Stats Cards -->
+                <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mt-8">
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary transition cursor-default">
+                        <dt class="text-sm font-medium text-gray-500 truncate">已收录课程</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-primary scale-100 hover:scale-110 transition">12,403</dd>
+                    </div>
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary transition cursor-default">
+                        <dt class="text-sm font-medium text-gray-500 truncate">真实评价</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition scale-100 hover:scale-110">45,291</dd>
+                    </div>
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary transition cursor-default">
+                        <dt class="text-sm font-medium text-gray-500 truncate">注册用户</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary scale-100 hover:scale-110 transition">8,902</dd>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popular Courses Section -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="flex items-center justify-between mb-8">
+                <h2 class="text-2xl font-bold text-gray-900 flex items-center">
+                    <i class="ph-fill ph-fire text-orange-500 mr-2"></i> 热门课程
+                </h2>
+                <a href="#" onclick="handleProtectedAction(event)" class="text-primary font-medium hover:text-secondary flex items-center">
+                    查看全部 <i class="ph-bold ph-arrow-right ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Course Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courseGrid">
+                <!-- JS will populate this area -->
+            </div>
+        </div>
+
+        </div>
+        <!-- Course List View -->
+        <div id="view-courses" class="tab-content hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">课程列表</h2>
+                <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
+                    <p class="text-lg text-gray-600 mb-4">功能规划中...</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-500">
+                        <li>高级课程搜索与筛选</li>
+                        <li>按学院/专业分类浏览</li>
+                        <li>课程热度排行榜</li>
+                        <li>分页加载与无限滚动</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Write Review View -->
+        <div id="view-review" class="tab-content hidden">
+             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">写点评</h2>
+                <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
+                    <p class="text-lg text-gray-600 mb-4">分享你的课程体验...</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-500">
+                        <li>课程搜索与关联</li>
+                        <li>多维度打分（难度、实用性、趣味性）</li>
+                        <li>富文本评价编辑器</li>
+                        <li>匿名/实名发布选项</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile View -->
+        <div id="view-profile" class="tab-content hidden">
+             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <h2 class="text-3xl font-bold text-gray-900 mb-6">个人中心</h2>
+                <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
+                    <p class="text-lg text-gray-600 mb-4">管理你的账户...</p>
+                    <ul class="list-disc list-inside space-y-2 text-gray-500">
+                        <li>个人资料编辑（头像、昵称、学校）</li>
+                        <li>我的点评记录管理</li>
+                        <li>收藏的课程列表</li>
+                        <li>账户安全设置</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Detail View -->
+        <div id="view-course-detail" class="tab-content hidden">
+					<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+						<div class="mx-auto h-14 flex items-center mb-4">
+							<button onclick="switchTab(event, 'home')" class="flex items-center text-gray-500 hover:text-primary transition">
+									<i class="ph-bold ph-arrow-left mr-2"></i> 返回列表
+							</button>
+						</div>
+                        
+						<div class="flex flex-col lg:flex-row lg:items-start gap-6">
+							<!-- Main Content -->
+							<div class="flex-1 space-y-6 min-w-0">
+								<!-- Basic Info -->
+								<div class="bg-white shadow rounded-2xl p-6 border border-gray-100">
+									<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+											<div>
+													<div class="flex items-center space-x-3 mb-1">
+															<h1 class="text-3xl font-bold text-gray-900" id="detail-code">COMP9021</h1>
+															<span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800" id="detail-status">开课中</span>
+													</div>
+													<h2 class="text-xl text-gray-600" id="detail-name">Principles of Programming</h2>
+											</div>
+											<div class="mt-4 md:mt-0 flex items-center space-x-4">
+														<div class="text-center px-4 py-2 bg-gray-50 rounded-lg">
+																<div class="text-xs text-gray-500">学分</div>
+																<div class="text-lg font-bold text-gray-900" id="detail-units">6 UOC</div>
+														</div>
+											</div>
+									</div>
+
+									<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+										<div class="col-span-2">
+												<h3 class="text-sm font-medium text-gray-900 uppercase tracking-wide mb-2">课程简介</h3>
+												<p class="text-gray-600 leading-relaxed" id="detail-desc">
+														Loading description...
+												</p>
+												<div class="mt-4">
+														<span class="text-sm font-medium text-gray-900">前置要求：</span>
+														<span class="text-sm text-primary" id="detail-prereq">COMP9031</span>
+												</div>
+										</div>
+										
+										<!-- Rating Dashboard -->
+										<div class="bg-indigo-50 rounded-xl p-5">
+											<div class="flex items-center justify-between mb-4">
+													<span class="text-sm font-medium text-gray-700">总体评分</span>
+													<div class="flex items-center">
+															<i class="ph-fill ph-star text-yellow-400 text-xl mr-1"></i>
+															<span class="text-2xl font-bold text-gray-900" id="detail-rating">4.8</span>
+													</div>
+											</div>
+											
+											<div class="space-y-3">
+													<div>
+															<div class="flex justify-between text-xs text-gray-600 mb-1">
+																	<span>工作量 (Workload)</span>
+																	<span id="detail-workload-val">繁重</span>
+															</div>
+															<div class="w-full bg-white rounded-full h-2">
+																	<div class="bg-indigo-500 h-2 rounded-full" style="width: 80%" id="detail-workload-bar"></div>
+															</div>
+													</div>
+													<div>
+															<div class="flex justify-between text-xs text-gray-600 mb-1">
+																	<span>给分 (Grading)</span>
+																	<span id="detail-grading-val">适中</span>
+															</div>
+															<div class="w-full bg-white rounded-full h-2">
+																	<div class="bg-green-500 h-2 rounded-full" style="width: 60%" id="detail-grading-bar"></div>
+															</div>
+													</div>
+													<div>
+															<div class="flex justify-between text-xs text-gray-600 mb-1">
+																	<span>趣味性 (Fun)</span>
+																	<span id="detail-fun-val">有趣</span>
+															</div>
+															<div class="w-full bg-white rounded-full h-2">
+																	<div class="bg-yellow-500 h-2 rounded-full" style="width: 90%" id="detail-fun-bar"></div>
+															</div>
+													</div>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!-- Reviews Section -->
+								<div class="bg-white shadow rounded-2xl p-6 border border-gray-100">
+									<h3 class="text-xl font-bold text-gray-900 mb-6">学生评价 (Student Reviews)</h3>
+									<div class="space-y-8" id="detail-reviews-list">
+													<!-- Reviews will be populated here -->
+									</div>
+								</div>
+							</div>
+
+							<!-- Right Actions Sidebar -->
+							<div class="hidden lg:flex flex-col gap-4 sticky top-24 shrink-0">
+								<!-- Like Button -->
+								<button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 hover:scale-110 transition group" title="点赞">
+										<i class="ph-fill ph-heart text-2xl group-hover:animate-pulse"></i>
+								</button>
+								
+								<!-- Bookmark Button -->
+								<button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-yellow-500 hover:border-yellow-500 hover:scale-110 transition group" title="收藏">
+										<i class="ph-fill ph-star text-2xl"></i>
+								</button>
+
+								<!-- Comment Button -->
+								<button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary hover:scale-110 transition group" title="写评论">
+										<i class="ph-fill ph-chat-circle-text text-2xl"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+        </div>
+    </main>
+
+    <!-- ================= Footer ================= -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center mb-4 md:mb-0">
+                <i class="ph-bold ph-tree-structure text-gray-400 text-xl mr-2"></i>
+                <p class="text-gray-500 text-sm">© 2024 IRBTree. Made for AU Students.</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-400 hover:text-gray-500 text-sm">关于我们</a>
+                <a href="#" class="text-gray-400 hover:text-gray-500 text-sm">隐私政策</a>
+                <a href="#" class="text-gray-400 hover:text-gray-500 text-sm">联系支持</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ================= Login Modal ================= -->
+    <div id="loginModal" class="fixed inset-0 z-50 flex items-center justify-center hidden-modal">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeLoginModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-8 relative z-10 transform transition-all scale-100">
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="ph-bold ph-x text-xl"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4 text-primary">
+                    <i class="ph-bold ph-lock-key text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">请先登录</h2>
+                <p class="text-gray-500 mt-2 text-sm">登录后查看详细评价、GPA 分布及更多功能。</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-6">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">邮箱 / 用户名</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-user text-gray-400"></i>
+                        </div>
+                        <input type="text" id="email" value="student@uni.edu.au" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm" placeholder="you@example.com">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">密码</label>
+                    <div class="mt-1 relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-lock text-gray-400"></i>
+                        </div>
+                        <input type="password" id="password" value="password123" class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition">
+                    立即登录
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-xs text-gray-400">默认账号已预填，直接点击登录即可体验。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= JavaScript Logic ================= -->
+    <script>
+        // 1. 模拟数据
+        const courses = [
+            { code: 'COMP9021', name: 'Principles of Programming', uni: 'UNSW', rating: 4.8, reviews: 124, tags: ['硬核', '作业多', '干货满满'] },
+            { code: 'FINC5001', name: 'Capital Markets and Corporate Finance', uni: 'USYD', rating: 3.2, reviews: 89, tags: ['挂科率高', '理论课'] },
+            { code: 'MKTG1001', name: 'Marketing Principles', uni: 'USYD', rating: 4.5, reviews: 210, tags: ['水课', '给分好', '有趣'] },
+            { code: 'FIT9136', name: 'Algorithms and Programming', uni: 'Monash', rating: 4.0, reviews: 56, tags: ['Python', '基础课'] },
+            { code: 'ACCT1101', name: 'Accounting for Decision Making', uni: 'UQ', rating: 3.8, reviews: 102, tags: ['考试难', '必修'] },
+            { code: 'ELEC1111', name: 'Electrical Circuit Fundamentals', uni: 'UNSW', rating: 2.9, reviews: 45, tags: ['天书', '慎选'] },
+        ];
+
+        // 2. 初始化渲染
+        document.addEventListener('DOMContentLoaded', () => {
+            renderAuthStatus();
+            renderCourses();
+        });
+        
+        // Mock Course Details Data
+        const courseDetailsMap = {
+            'COMP9021': {
+                desc: '本课程介绍编程的基本原理。涵盖的主题包括：编程语言、控制结构、函数、数组、指针、字符串、结构体、文件操作、动态内存分配、递归等。适合零基础转码选手。',
+                units: '6 UOC',
+                prereq: ['COMP9031'],
+                status: '开课中',
+                statusColor: 'bg-green-100 text-green-800',
+                ratings: {
+                    workload: { val: 4.5, text: '繁重' },
+                    grading: { val: 3.0, text: '适中' },
+                    fun: { val: 4.8, text: '有趣' }
+                },
+                reviews: [
+                    { user: 'Alex', term: '2024 T3', content: '课程内容非常扎实，Eric老师讲得很好，但是作业量真的很大，建议提前预习。', date: '2024-12-10', likes: 12 },
+                    { user: 'Sarah', term: '2024 T1', content: '对于没有编程基础的人来说有点难，需要花大量时间练习。', date: '2024-05-20', likes: 8 }
+                ]
+            },
+            'FINC5001': {
+                desc: '金融市场的基本介绍，包括股票、债券、外汇等市场，以及公司金融的基本概念，如时间价值、资本预算、风险与收益等。',
+                units: '6 UOC',
+                prereq: ['COMP9031', 'COMP9021'],
+                status: '开课中',
+                statusColor: 'bg-green-100 text-green-800',
+                ratings: {
+                    workload: { val: 3.5, text: '适中' },
+                    grading: { val: 2.0, text: '杀手' },
+                    fun: { val: 2.5, text: '一般' }
+                },
+                reviews: [
+                    { user: 'Tom', term: '2024 S2', content: '理论性很强，考试很难，挂科率确实不低，大家小心。', date: '2024-11-15', likes: 25 },
+                    { user: 'Jerry', term: '2024 S1', content: '老师讲得比较枯燥，容易睡着。', date: '2024-06-10', likes: 5 }
+                ]
+            },
+            'MKTG1001': {
+                desc: '市场营销的基础入门课。内容轻松有趣，小组作业比较多，适合作为凑学分的选修课。',
+                units: '6 UOC',
+                prereq: [],
+                status: '开课中',
+                statusColor: 'bg-green-100 text-green-800',
+                ratings: {
+                    workload: { val: 2.0, text: '轻松' },
+                    grading: { val: 4.8, text: '水课' },
+                    fun: { val: 4.5, text: '有趣' }
+                },
+                reviews: [
+                    { user: 'Alice', term: '2024 S2', content: '真正的水课，给分超好，推荐！', date: '2024-11-20', likes: 40 },
+                ]
+            }
+        };
+
+        // Default mock for others
+        const defaultDetail = {
+            desc: '暂无详细介绍。该课程涵盖了该领域的核心概念和实践技能。',
+            units: '6 UOC',
+            prereq: [],
+            status: '未知',
+            statusColor: 'bg-gray-100 text-gray-800',
+            ratings: {
+                workload: { val: 3.0, text: '适中' },
+                grading: { val: 3.0, text: '适中' },
+                fun: { val: 3.0, text: '一般' }
+            },
+            reviews: []
+        };
+
+        // 3. 渲染课程卡片
+        function renderCourses() {
+            const grid = document.getElementById('courseGrid');
+            grid.innerHTML = courses.map(course => `
+                <div class="bg-white rounded-xl border border-gray-200 p-6 card-hover flex flex-col justify-between h-full">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                                ${course.uni}
+                            </span>
+                            <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-lg">
+                                <i class="ph-fill ph-star text-yellow-400 mr-1"></i>
+                                <span class="font-bold text-gray-900">${course.rating}</span>
+                            </div>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">${course.code}</h3>
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2 h-10">${course.name}</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            ${course.tags.map(tag => `<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium ${getTagColor(tag)}">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-gray-100 flex items-center justify-between">
+                        <span class="text-xs text-gray-500">${course.reviews} 条评价</span>
+                        <button onclick="openCourseDetail(event, '${course.code}')" class="text-sm font-medium text-primary hover:text-secondary flex items-center transition">
+                            查看详情 <i class="ph-bold ph-caret-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getTagColor(tag) {
+            const goodTags = ['干货满满', '水课', '给分好', '有趣'];
+            const badTags = ['挂科率高', '考试难', '天书', '慎选', '作业多'];
+            
+            if (goodTags.includes(tag)) {
+                return 'bg-green-100 text-green-800';
+            } else if (badTags.includes(tag)) {
+                return 'bg-red-100 text-red-800';
+            }
+            return 'bg-gray-100 text-gray-800';
+        }
+
+        // 4. 认证逻辑 (SessionStorage)
+        function isLogged() {
+            return sessionStorage.getItem('irbtree_user') !== null;
+        }
+
+        function renderAuthStatus() {
+            const authSection = document.getElementById('authSection');
+            if (isLogged()) {
+                const user = JSON.parse(sessionStorage.getItem('irbtree_user'));
+                authSection.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right hidden sm:block">
+                            <p class="text-sm font-medium text-gray-900">${user.name}</p>
+                            <p class="text-xs text-gray-500">学生认证</p>
+                        </div>
+                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold border border-indigo-200">
+                            ${user.name.charAt(0)}
+                        </div>
+                        <button onclick="handleLogout()" class="text-gray-400 hover:text-gray-600">
+                            <i class="ph-bold ph-sign-out text-xl"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <button onclick="openLoginModal()" class="text-gray-500 hover:text-gray-900 font-medium px-3 py-2 text-sm transition">登录</button>
+                    <button onclick="openLoginModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition transform hover:scale-105">注册</button>
+                `;
+            }
+        }
+
+        // 5. 交互处理
+        // Tab Switching Logic
+        function switchTab(event, tabId) {
+            event.preventDefault();
+            
+            // Check protection
+            if (tabId !== 'home' && !isLogged()) {
+                openLoginModal();
+                return;
+            }
+
+            // Hide all views
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            // Show selected view
+            const selectedView = document.getElementById('view-' + tabId);
+            if (selectedView) {
+                selectedView.classList.remove('hidden');
+                selectedView.classList.add('block');
+            }
+
+            // Update Nav State
+            updateNavState(tabId);
+        }
+
+        function updateNavState(activeTabId) {
+            const navItems = document.querySelectorAll('.nav-item');
+            const activeClasses = ['text-primary', 'font-medium', 'border-primary'];
+            const inactiveClasses = ['text-gray-500', 'hover:text-gray-900', 'hover:border-gray-300', 'border-transparent'];
+
+            navItems.forEach(item => {
+                const itemTabId = item.id.replace('nav-', '');
+                if (itemTabId === activeTabId) {
+                    item.classList.remove(...inactiveClasses);
+                    item.classList.add(...activeClasses);
+                } else {
+                    item.classList.remove(...activeClasses);
+                    item.classList.add(...inactiveClasses);
+                }
+            });
+        }
+
+        function handleProtectedAction(e) {
+            e.preventDefault();
+            if (isLogged()) {
+                // 如果已登录，正常跳转（这里模拟跳转提示）
+                alert("跳转功能演示：已登录，正在进入详情页...");
+            } else {
+                // 未登录，显示弹窗
+                openLoginModal();
+            }
+        }
+        
+        function handleSearch() {
+             // 搜索不需要登录，但搜索结果详情需要
+             const input = document.querySelector('input[type="text"]').value;
+             if(!input) {
+                 alert("请输入搜索内容");
+                 return;
+             }
+             alert(`正在搜索: ${input}\n(Demo演示：搜索结果将显示在下方列表)`);
+        }
+
+        // 6. 课程详情逻辑
+        function openCourseDetail(event, courseCode) {
+            event.preventDefault();
+            
+            // Check protection
+            if (!isLogged()) {
+                openLoginModal();
+                return;
+            }
+
+            // Find course basic info
+            const course = courses.find(c => c.code === courseCode);
+            if (!course) return;
+
+            // Find detailed info
+            const detail = courseDetailsMap[courseCode] || defaultDetail;
+
+            // Populate DOM
+            document.getElementById('detail-code').textContent = course.code;
+            document.getElementById('detail-name').textContent = course.name;
+            document.getElementById('detail-status').textContent = detail.status;
+            document.getElementById('detail-status').className = `px-2.5 py-0.5 rounded-full text-xs font-medium ${detail.statusColor}`;
+            document.getElementById('detail-units').textContent = detail.units;
+            document.getElementById('detail-desc').textContent = detail.desc;
+            
+            // Handle Prereq array
+            const prereqContainer = document.getElementById('detail-prereq');
+            if (Array.isArray(detail.prereq) && detail.prereq.length > 0) {
+                 prereqContainer.innerHTML = detail.prereq.map(p => 
+                    `<span class="cursor-pointer bg-indigo-100 text-primary hover:cursor-pointer border border-indigo-300 rounded-md px-2.5 py-0.5 text-xs font-medium transition" onclick="openCourseDetail(event, '${p}')">${p}</span>`
+                 ).join(', ');
+            } else {
+                prereqContainer.textContent = 'None';
+            }
+            
+            document.getElementById('detail-rating').textContent = course.rating;
+
+            // Update Rating Bars
+            updateRatingBar('workload', detail.ratings.workload);
+            updateRatingBar('grading', detail.ratings.grading);
+            updateRatingBar('fun', detail.ratings.fun);
+
+            // Populate Reviews
+            renderReviews(detail.reviews);
+
+            // Switch View
+            switchTab(event, 'course-detail');
+            // Scroll to top
+            window.scrollTo(0, 0);
+        }
+
+        function updateRatingBar(type, data) {
+            document.getElementById(`detail-${type}-val`).textContent = data.text;
+            // Map 1-5 to percentage 0-100%
+            const percentage = (data.val / 5) * 100;
+            document.getElementById(`detail-${type}-bar`).style.width = `${percentage}%`;
+        }
+
+        function renderReviews(reviews) {
+            const container = document.getElementById('detail-reviews-list');
+            if (reviews.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无评价，快来抢沙发吧！</p>';
+                return;
+            }
+
+            container.innerHTML = reviews.map(review => `
+                <div class="flex space-x-4">
+                    <div class="flex-shrink-0">
+                        <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
+                            ${review.user.charAt(0)}
+                        </div>
+                    </div>
+                    <div class="flex-grow">
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="text-sm font-bold text-gray-900">
+															<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 mr-2">
+                                ${review.term}
+                              </span>
+															${review.user}
+														</h4>
+                            <span class="text-xs text-gray-500">${review.date}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-3">${review.content}</p>
+                        <div class="flex items-center space-x-4">
+                            <button class="flex items-center text-xs text-gray-500 hover:text-primary transition">
+                                <i class="ph ph-thumbs-up mr-1 text-lg"></i> 有用 (${review.likes})
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 7. 模态框控制
+        const modal = document.getElementById('loginModal');
+
+        function openLoginModal() {
+            modal.classList.remove('hidden-modal');
+            modal.classList.add('visible-modal');
+        }
+
+        function closeLoginModal() {
+            modal.classList.remove('visible-modal');
+            modal.classList.add('hidden-modal');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            // 模拟登录成功
+            const mockUser = {
+                name: 'Alex Student',
+                email: email,
+                token: 'mock-jwt-token-123'
+            };
+            sessionStorage.setItem('irbtree_user', JSON.stringify(mockUser));
+            
+            // UI 反馈
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = '登录成功...';
+            btn.classList.add('bg-green-600');
+            
+            setTimeout(() => {
+                closeLoginModal();
+                renderAuthStatus();
+                // 重置按钮状态
+                btn.innerText = originalText;
+                btn.classList.remove('bg-green-600');
+                // 刷新页面或重新加载数据（可选）
+                // window.location.reload(); 
+            }, 800);
+        }
+
+        function handleLogout() {
+            if(confirm('确定要退出登录吗？')) {
+                sessionStorage.removeItem('irbtree_user');
+                renderAuthStatus();
+                window.location.reload(); // 刷新以重置状态
+            }
+        }
+    </script>
+</body>
+</html>
