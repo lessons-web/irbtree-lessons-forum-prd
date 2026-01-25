@@ -86,12 +86,12 @@
                 <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mb-4">
                     拒绝挂科，<span class="text-primary">选课不踩雷</span>
                 </h1>
-                <p class="text-xl text-gray-500 max-w-4xl mx-auto mb-10">
+                <p class="text-xl text-gray-500 max-w-4xl mx-auto my-10">
                     澳洲留学生专属的课程评价平台，查看真实学长学姐评价，查询 GPA 杀手课与水课。
                 </p>
 
                 <!-- Search Bar -->
-                <div class="relative max-w-2xl mx-auto mb-12 group">
+                <div class="relative max-w-3xl mx-auto mb-12 group">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <i class="ph ph-magnifying-glass text-gray-400 text-xl"></i>
                     </div>
@@ -107,18 +107,18 @@
                 </div>
 
                 <!-- Data Stats Cards -->
-                <div class="grid grid-cols-1 gap-5 sm:grid-cols-3 mt-8">
-                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary transition cursor-default">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3 mt-8">
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
                         <dt class="text-sm font-medium text-gray-500 truncate">已收录课程</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-primary scale-100 hover:scale-110 transition">12,403</dd>
+                        <dd class="mt-1 text-3xl font-semibold text-primary transition">12,403</dd>
                     </div>
-                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary transition cursor-default">
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
                         <dt class="text-sm font-medium text-gray-500 truncate">真实评价</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition scale-100 hover:scale-110">45,291</dd>
+                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition">45,291</dd>
                     </div>
-                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary transition cursor-default">
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
                         <dt class="text-sm font-medium text-gray-500 truncate">注册用户</dt>
-                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary scale-100 hover:scale-110 transition">8,902</dd>
+                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition">8,902</dd>
                     </div>
                 </div>
             </div>
@@ -144,16 +144,104 @@
         </div>
         <!-- Course List View -->
         <div id="view-courses" class="tab-content hidden">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">课程列表</h2>
-                <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
-                    <p class="text-lg text-gray-600 mb-4">功能规划中...</p>
-                    <ul class="list-disc list-inside space-y-2 text-gray-500">
-                        <li>高级课程搜索与筛选</li>
-                        <li>按学院/专业分类浏览</li>
-                        <li>课程热度排行榜</li>
-                        <li>分页加载与无限滚动</li>
-                    </ul>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Filter Bar -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <!-- Search -->
+                        <div class="md:col-span-1">
+                            <label class="block text-xs font-medium text-gray-700 mb-1">搜索课程</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ph ph-magnifying-glass text-gray-400"></i>
+                                </div>
+                                <input type="text" id="list-search" oninput="handleListFilter()" placeholder="代码 / 名称" class="block w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
+                            </div>
+                        </div>
+
+                        <!-- School Filter -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">学校</label>
+                            <select id="list-school" onchange="handleListFilter()" class="block w-full pl-3 pr-10 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-lg">
+                                <option value="all">全部学校</option>
+                                <option value="UNSW">UNSW</option>
+                                <option value="USYD">USYD</option>
+                                <option value="Monash">Monash</option>
+                                <option value="UQ">UQ</option>
+                                <option value="Melb">Melbourne</option>
+                            </select>
+                        </div>
+
+                        <!-- Sort By -->
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">排序方式</label>
+                            <select id="list-sort" onchange="handleListFilter()" class="block w-full pl-3 pr-10 py-2 text-sm border border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded-lg">
+                                <option value="rating_desc">评分 (从高到低)</option>
+                                <option value="rating_asc">评分 (从低到高)</option>
+                                <option value="reviews_desc">热度 (从高到低)</option>
+                                <option value="reviews_asc">热度 (从低到高)</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Reset -->
+                         <div class="flex items-end">
+                            <button onclick="resetListFilters()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 px-4 rounded-lg text-sm font-medium transition flex items-center justify-center">
+                                <i class="ph ph-arrow-counter-clockwise mr-2"></i> 重置筛选
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course List Container -->
+                <div id="full-course-list" class="space-y-4">
+                    <!-- JS Populated -->
+                    <div class="text-center py-12">
+                        <i class="ph ph-spinner animate-spin text-4xl text-primary"></i>
+                        <p class="mt-4 text-gray-500">正在加载课程数据...</p>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="mt-8 flex items-center justify-between border-t border-gray-200 pt-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <button onclick="changePage(-1)" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            上一页
+                        </button>
+                        <button onclick="changePage(1)" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                            下一页
+                        </button>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700">
+                                显示第 <span class="font-medium" id="page-start">1</span> 到 <span class="font-medium" id="page-end">10</span> 条，共 <span class="font-medium" id="total-items">97</span> 条
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                             <!-- Items Per Page -->
+                             <select id="items-per-page" onchange="handlePageSizeChange()" class="block w-20 pl-2 pr-8 py-1 text-xs border border-gray-300 focus:outline-none focus:ring-primary focus:border-primary rounded">
+                                <option value="5">5条/页</option>
+                                <option value="10">10条/页</option>
+                                <option value="20">20条/页</option>
+                            </select>
+
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                                <button onclick="changePage(-1)" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Previous</span>
+                                    <i class="ph-bold ph-caret-left"></i>
+                                </button>
+                                <!-- Page Numbers Container -->
+                                <div id="pagination-numbers" class="flex">
+                                    <!-- JS Populated -->
+                                </div>
+                                <button onclick="changePage(1)" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                    <span class="sr-only">Next</span>
+                                    <i class="ph-bold ph-caret-right"></i>
+                                </button>
+                            </nav>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -222,6 +310,23 @@
 
 									<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
 										<div class="col-span-2">
+                                            <!-- Teaching Staff -->
+                                            <div class="mb-6 bg-gray-50 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                                                <div class="flex items-center">
+                                                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-2">导师</span>
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="font-medium text-primary" id="detail-lecturer">Eric Martin</span>
+                                                    </div>
+                                                </div>
+                                                <div class="hidden sm:block w-px h-4 bg-gray-300"></div>
+                                                <div class="flex items-center">
+                                                    <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider mr-2">助教</span>
+                                                    <div class="flex items-center space-x-2" id="detail-tutors">
+                                                        <!-- Tutors populated by JS -->
+                                                    </div>
+                                                </div>
+                                            </div>
+
 												<h3 class="text-sm font-medium text-gray-900 uppercase tracking-wide mb-2">课程简介</h3>
 												<p class="text-gray-600 leading-relaxed" id="detail-desc">
 														Loading description...
@@ -277,7 +382,13 @@
 
 								<!-- Reviews Section -->
 								<div class="bg-white shadow rounded-2xl p-6 border border-gray-100">
-									<h3 class="text-xl font-bold text-gray-900 mb-6">学生评价 (Student Reviews)</h3>
+                                    <div class="flex items-center justify-between mb-6">
+									    <h3 class="text-xl font-bold text-gray-900">学生评价 (Student Reviews)</h3>
+                                        <button class="flex items-center bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition transform hover:scale-105">
+                                            <i class="ph-bold ph-pencil-simple mr-2"></i>
+                                            写评价
+                                        </button>
+                                    </div>
 									<div class="space-y-8" id="detail-reviews-list">
 													<!-- Reviews will be populated here -->
 									</div>
@@ -285,22 +396,22 @@
 							</div>
 
 							<!-- Right Actions Sidebar -->
-							<div class="hidden lg:flex flex-col gap-4 sticky top-24 shrink-0">
-								<!-- Like Button -->
-								<button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 hover:scale-110 transition group" title="点赞">
-										<i class="ph-fill ph-heart text-2xl group-hover:animate-pulse"></i>
-								</button>
-								
-								<!-- Bookmark Button -->
-								<button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-yellow-500 hover:border-yellow-500 hover:scale-110 transition group" title="收藏">
-										<i class="ph-fill ph-star text-2xl"></i>
-								</button>
+<div class="hidden lg:flex flex-col gap-4 sticky top-24 shrink-0">
+  <!-- Like Button -->
+  <button id="detail-action-like" onclick="toggleCourseLike(this)" class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 hover:scale-110 transition group" title="点赞">
+    <i class="ph-fill ph-heart text-2xl group-hover:animate-pulse"></i>
+  </button>
+  
+  <!-- Bookmark Button -->
+  <button id="detail-action-bookmark" onclick="toggleCourseBookmark(this)" class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-yellow-500 hover:border-yellow-500 hover:scale-110 transition group" title="收藏">
+    <i class="ph-fill ph-star text-2xl"></i>
+  </button>
 
-								<!-- Comment Button -->
-								<button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary hover:scale-110 transition group" title="写评论">
-										<i class="ph-fill ph-chat-circle-text text-2xl"></i>
-								</button>
-							</div>
+  <!-- Comment Button -->
+  <button class="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-primary hover:border-primary hover:scale-110 transition group" title="写评论">
+    <i class="ph-fill ph-chat-circle-text text-2xl"></i>
+  </button>
+</div>
 						</div>
 					</div>
         </div>
@@ -375,7 +486,7 @@
     <!-- ================= JavaScript Logic ================= -->
     <script>
         // 1. 模拟数据
-        const courses = [
+        let courses = [
             { code: 'COMP9021', name: 'Principles of Programming', uni: 'UNSW', rating: 4.8, reviews: 124, tags: ['硬核', '作业多', '干货满满'] },
             { code: 'FINC5001', name: 'Capital Markets and Corporate Finance', uni: 'USYD', rating: 3.2, reviews: 89, tags: ['挂科率高', '理论课'] },
             { code: 'MKTG1001', name: 'Marketing Principles', uni: 'USYD', rating: 4.5, reviews: 210, tags: ['水课', '给分好', '有趣'] },
@@ -383,11 +494,49 @@
             { code: 'ACCT1101', name: 'Accounting for Decision Making', uni: 'UQ', rating: 3.8, reviews: 102, tags: ['考试难', '必修'] },
             { code: 'ELEC1111', name: 'Electrical Circuit Fundamentals', uni: 'UNSW', rating: 2.9, reviews: 45, tags: ['天书', '慎选'] },
         ];
+        
+        // Generate more mock data
+        const unis = ['UNSW', 'USYD', 'Monash', 'UQ', 'Melb'];
+        const subjects = ['COMP', 'FINC', 'MKTG', 'ECON', 'MATH', 'ARTS', 'ENGG'];
+        const tagPool = ['硬核', '水课', '给分好', '作业多', '有趣', '必修', '选修', '慎选'];
+        
+        for(let i=0; i<30; i++) {
+             const subject = subjects[Math.floor(Math.random() * subjects.length)];
+             const code = subject + Math.floor(1000 + Math.random() * 9000);
+             const uni = unis[Math.floor(Math.random() * unis.length)];
+             const rating = (2 + Math.random() * 3).toFixed(1);
+             const reviews = Math.floor(Math.random() * 200);
+             const likes = Math.floor(reviews * (0.5 + Math.random() * 0.5)); // Likes related to reviews
+             const favorites = Math.floor(Math.random() * 100) || 1;
+             const isLiked = Math.random() > 0.7; // 30% chance
+             const isFavorited = Math.random() > 0.8; // 20% chance
+
+             const tags = [];
+             for(let j=0; j<Math.floor(1+Math.random()*3); j++) {
+                 tags.push(tagPool[Math.floor(Math.random() * tagPool.length)]);
+             }
+             // Ensure uniqueness
+             if(!courses.find(c => c.code === code)) {
+                courses.push({
+                    code,
+                    name: `Advanced ${subject} Concepts and Applications`,
+                    uni,
+                    rating: parseFloat(rating),
+                    reviews,
+                    likes,
+                    favorites,
+                    isLiked,
+                    isFavorited,
+                    tags: [...new Set(tags)]
+                });
+             }
+        }
 
         // 2. 初始化渲染
         document.addEventListener('DOMContentLoaded', () => {
             renderAuthStatus();
-            renderCourses();
+            renderCourses(); // Home page grid
+            handleListFilter(); // Initial List View Render
         });
         
         // Mock Course Details Data
@@ -397,15 +546,41 @@
                 units: '6 UOC',
                 prereq: ['COMP9031'],
                 status: '开课中',
+                lecturer: 'Eric Martin',
+                tutors: ['Abir', 'Xinyue'],
                 statusColor: 'bg-green-100 text-green-800',
+                isLiked: true,
+                isBookmarked: true,
                 ratings: {
                     workload: { val: 4.5, text: '繁重' },
                     grading: { val: 3.0, text: '适中' },
                     fun: { val: 4.8, text: '有趣' }
                 },
                 reviews: [
-                    { user: 'Alex', term: '2024 T3', content: '课程内容非常扎实，Eric老师讲得很好，但是作业量真的很大，建议提前预习。', date: '2024-12-10', likes: 12 },
-                    { user: 'Sarah', term: '2024 T1', content: '对于没有编程基础的人来说有点难，需要花大量时间练习。', date: '2024-05-20', likes: 8 }
+                    { 
+                        id: 'r1',
+                        user: 'Alex', 
+                        term: '2024 T3', 
+                        content: '课程内容非常扎实，Eric老师讲得很好，但是作业量真的很大，建议提前预习。', 
+                        date: '2024-12-10', 
+                        likes: 12,
+                        isLiked: true,
+                        rating: 5.0,
+                        replies: [
+                            { user: 'Eric', content: '感谢你的认可！作业确实有点多，加油！', date: '2024-12-11' }
+                        ]
+                    },
+                    { 
+                        id: 'r2',
+                        user: 'Sarah', 
+                        term: '2024 T1', 
+                        content: '对于没有编程基础的人来说有点难，需要花大量时间练习。', 
+                        date: '2024-05-20', 
+                        likes: 8,
+                        isLiked: false,
+                        rating: 4.0,
+                        replies: []
+                    }
                 ]
             },
             'FINC5001': {
@@ -413,15 +588,42 @@
                 units: '6 UOC',
                 prereq: ['COMP9031', 'COMP9021'],
                 status: '开课中',
+                lecturer: 'Peter John',
+                tutors: ['Sarah', 'Mike'],
                 statusColor: 'bg-green-100 text-green-800',
+                isLiked: true,
+                isBookmarked: true,
                 ratings: {
                     workload: { val: 3.5, text: '适中' },
                     grading: { val: 2.0, text: '杀手' },
                     fun: { val: 2.5, text: '一般' }
                 },
                 reviews: [
-                    { user: 'Tom', term: '2024 S2', content: '理论性很强，考试很难，挂科率确实不低，大家小心。', date: '2024-11-15', likes: 25 },
-                    { user: 'Jerry', term: '2024 S1', content: '老师讲得比较枯燥，容易睡着。', date: '2024-06-10', likes: 5 }
+                    { 
+                        id: 'r3',
+                        user: 'Tom', 
+                        term: '2024 S2', 
+                        content: '理论性很强，考试很难，挂科率确实不低，大家小心。', 
+                        date: '2024-11-15', 
+                        likes: 25,
+                        isLiked: false,
+                        rating: 3.0,
+                        replies: [
+                            { user: 'Jerry', content: '确实，我也挂了...', date: '2024-11-16' },
+                            { user: 'Tom', content: '太惨了兄弟', date: '2024-11-16' }
+                        ]
+                    },
+                    { 
+                        id: 'r4',
+                        user: 'Jerry', 
+                        term: '2024 S1', 
+                        content: '老师讲得比较枯燥，容易睡着。', 
+                        date: '2024-06-10', 
+                        likes: 5,
+                        isLiked: true,
+                        rating: 2.0,
+                        replies: []
+                    }
                 ]
             },
             'MKTG1001': {
@@ -429,6 +631,8 @@
                 units: '6 UOC',
                 prereq: [],
                 status: '开课中',
+                lecturer: 'Jessica Lee',
+                tutors: ['Tom'],
                 statusColor: 'bg-green-100 text-green-800',
                 ratings: {
                     workload: { val: 2.0, text: '轻松' },
@@ -436,7 +640,15 @@
                     fun: { val: 4.5, text: '有趣' }
                 },
                 reviews: [
-                    { user: 'Alice', term: '2024 S2', content: '真正的水课，给分超好，推荐！', date: '2024-11-20', likes: 40 },
+                    { 
+                        user: 'Alice', 
+                        term: '2024 S2', 
+                        content: '真正的水课，给分超好，推荐！', 
+                        date: '2024-11-20', 
+                        likes: 40,
+                        rating: 5.0,
+                        replies: []
+                    },
                 ]
             }
         };
@@ -447,6 +659,8 @@
             units: '6 UOC',
             prereq: [],
             status: '未知',
+            lecturer: 'Unknown',
+            tutors: [],
             statusColor: 'bg-gray-100 text-gray-800',
             ratings: {
                 workload: { val: 3.0, text: '适中' },
@@ -459,7 +673,9 @@
         // 3. 渲染课程卡片
         function renderCourses() {
             const grid = document.getElementById('courseGrid');
-            grid.innerHTML = courses.map(course => `
+            // 只显示前 6 个热门课程
+            const displayCourses = courses.slice(0, 6);
+            grid.innerHTML = displayCourses.map(course => `
                 <div class="bg-white rounded-xl border border-gray-200 p-6 card-hover flex flex-col justify-between h-full">
                     <div>
                         <div class="flex justify-between items-start mb-2">
@@ -596,6 +812,267 @@
              alert(`正在搜索: ${input}\n(Demo演示：搜索结果将显示在下方列表)`);
         }
 
+        // ================= List View Logic =================
+        let listState = {
+            page: 1,
+            pageSize: 5,
+            search: '',
+            school: 'all',
+            sortBy: 'rating', // rating, reviews
+            sortOrder: 'desc', // desc, asc
+            filteredData: []
+        };
+
+        function handleListFilter() {
+            // Get inputs
+            listState.search = document.getElementById('list-search').value.toLowerCase();
+            listState.school = document.getElementById('list-school').value;
+            
+            const sortVal = document.getElementById('list-sort').value; // rating_desc
+            const [field, order] = sortVal.split('_');
+            listState.sortBy = field;
+            listState.sortOrder = order;
+
+            // Reset page to 1 on filter change
+            listState.page = 1;
+            
+            // Apply Filters
+            listState.filteredData = courses.filter(c => {
+                const matchSearch = c.code.toLowerCase().includes(listState.search) || c.name.toLowerCase().includes(listState.search);
+                const matchSchool = listState.school === 'all' || c.uni === listState.school;
+                return matchSearch && matchSchool;
+            });
+
+            // Apply Sort
+            listState.filteredData.sort((a, b) => {
+                let valA = a[listState.sortBy];
+                let valB = b[listState.sortBy];
+                
+                if (listState.sortOrder === 'asc') {
+                    return valA - valB;
+                } else {
+                    return valB - valA;
+                }
+            });
+
+            renderCourseList();
+        }
+
+        function resetListFilters() {
+            document.getElementById('list-search').value = '';
+            document.getElementById('list-school').value = 'all';
+            document.getElementById('list-sort').value = 'rating_desc';
+            handleListFilter();
+        }
+
+        function handlePageSizeChange() {
+            listState.pageSize = parseInt(document.getElementById('items-per-page').value);
+            listState.page = 1;
+            renderCourseList();
+        }
+
+        function changePage(delta) {
+            const totalPages = Math.ceil(listState.filteredData.length / listState.pageSize);
+            const newPage = listState.page + delta;
+            
+            if (newPage >= 1 && newPage <= totalPages) {
+                listState.page = newPage;
+                renderCourseList();
+                // Scroll to list top
+                document.getElementById('view-courses').scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        function renderCourseList() {
+            const container = document.getElementById('full-course-list');
+            const total = listState.filteredData.length;
+            
+            if (total === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12 bg-gray-50 rounded-xl border border-gray-200 border-dashed">
+                        <i class="ph ph-magnifying-glass text-4xl text-gray-300"></i>
+                        <p class="mt-4 text-gray-500">没有找到匹配的课程，换个关键词试试？</p>
+                    </div>
+                `;
+                updatePagination(0);
+                return;
+            }
+
+            // Slice Data
+            const start = (listState.page - 1) * listState.pageSize;
+            const end = Math.min(start + listState.pageSize, total);
+            const pageData = listState.filteredData.slice(start, end);
+
+            container.innerHTML = pageData.map(course => {
+                // Merge with detail data if available
+                const detail = courseDetailsMap[course.code] || defaultDetail;
+                
+                // Get Rating Dimensions
+                const workload = detail.ratings?.workload || { val: 3.0, text: 'N/A' };
+                const grading = detail.ratings?.grading || { val: 3.0, text: 'N/A' };
+                const fun = detail.ratings?.fun || { val: 3.0, text: 'N/A' };
+                
+                // Truncate desc
+                const desc = detail.desc.length > 80 ? detail.desc.substring(0, 80) + '...' : detail.desc;
+
+                return `
+                <div class="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition flex flex-col lg:flex-row gap-6">
+                    <!-- Left: Main Info -->
+                    <div class="flex-grow min-w-0">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="flex items-center space-x-3">
+                                <h3 onclick="openCourseDetail(event, '${course.code}')" class="cursor-pointer text-xl font-bold text-gray-900 hover:text-primary">${course.code}</h3>
+                                <div class="flex gap-2">
+                                    ${course.tags.map(t => `<span class="px-2 py-0.5 rounded text-xs font-medium ${getTagColor(t)}">${t}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="text-gray-600 font-medium mb-3">${course.name}</h4>
+                        <p class="text-sm text-gray-500 mb-4 leading-relaxed">
+                            “${desc}”
+                        </p>
+                        
+                        <div class="flex items-center space-x-6 text-sm text-gray-500">
+                            <!-- Like/Recommend -->
+                            <button onclick="toggleListLike(event, '${course.code}')" class="flex items-center transition hover:text-primary ${course.isLiked ? 'text-primary font-medium' : ''} group">
+                                <i class="${course.isLiked ? 'ph-fill' : 'ph'} ph-thumbs-up mr-1.5 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span>${course.likes || '0'}</span>
+                                <span class="ml-1">推荐</span>
+                            </button>
+
+                            <!-- Favorite -->
+                            <button onclick="toggleListFavorite(event, '${course.code}')" class="flex items-center transition hover:text-yellow-500 ${course.isFavorited ? 'text-yellow-500 font-medium' : ''} group">
+                                <i class="${course.isFavorited ? 'ph-fill' : 'ph'} ph-star mr-1.5 text-lg group-hover:scale-110 transition-transform"></i>
+                                <span>${course.favorites || '0'}</span>
+                                <span class="ml-1">收藏</span>
+                            </button>
+
+                            <!-- Comments -->
+                            <div class="flex items-center">
+                                <i class="ph ph-chat-circle mr-1.5 text-lg"></i> ${course.reviews} 条评论
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Ratings & Meta (Fixed Width) -->
+                    <div class="lg:w-72 flex-shrink-0 border-t lg:border-t-0 lg:border-l border-gray-100 pt-4 lg:pt-0 lg:pl-6 flex flex-col justify-center">
+                         <div class="flex items-center justify-end mb-4">
+                             <div class="flex text-yellow-400 text-sm mr-2">
+                                 ${Array(5).fill(0).map((_, i) => `<i class="${i < Math.floor(course.rating) ? 'ph-fill' : 'ph'} ph-star"></i>`).join('')}
+                             </div>
+                             <span class="text-xl font-bold text-gray-900">${course.rating}</span>
+                         </div>
+                         
+                         <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-gray-600">
+                             <div class="flex justify-between">
+                                 <span>课程难度:</span>
+                                 <span class="font-medium text-gray-900">${workload.text} (${workload.val})</span>
+                             </div>
+                             <div class="flex justify-between">
+                                 <span>作业多少:</span>
+                                 <span class="font-medium text-gray-900">${workload.text} (${workload.val})</span>
+                             </div>
+                             <div class="flex justify-between">
+                                 <span>给分好坏:</span>
+                                 <span class="font-medium text-gray-900">${grading.text} (${grading.val})</span>
+                             </div>
+                             <div class="flex justify-between">
+                                 <span>收获大小:</span>
+                                 <span class="font-medium text-gray-900">${fun.text} (${fun.val})</span>
+                             </div>
+                         </div>
+                         
+                         <div class="mt-4 pt-4 border-t border-gray-50 flex justify-between text-xs">
+                             <span class="text-gray-500">前置要求:</span>
+                             <span class="font-medium text-gray-900">${detail.prereq && detail.prereq.length > 0 ? detail.prereq[0] : '暂无前置'}</span>
+                         </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            updatePagination(total);
+        }
+
+        function updatePagination(total) {
+            // Update counts
+            const start = total === 0 ? 0 : (listState.page - 1) * listState.pageSize + 1;
+            const end = Math.min(start + listState.pageSize - 1, total);
+            
+            document.getElementById('page-start').textContent = start;
+            document.getElementById('page-end').textContent = end;
+            document.getElementById('total-items').textContent = total;
+
+            // Render Page Numbers
+            const totalPages = Math.ceil(total / listState.pageSize);
+            const container = document.getElementById('pagination-numbers');
+            let html = '';
+            
+            // Simple Logic: Show all if <= 7, else show start, end, current +/- 1
+            // For simplicity in this iteration: Show up to 5 pages around current
+            let startPage = Math.max(1, listState.page - 2);
+            let endPage = Math.min(totalPages, listState.page + 2);
+            
+            if (totalPages > 0) {
+                for (let i = startPage; i <= endPage; i++) {
+                    const activeClass = i === listState.page 
+                        ? 'z-10 bg-indigo-50 border-primary text-primary' 
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50';
+                    
+                    html += `
+                        <button onclick="goToPage(${i})" class="relative inline-flex items-center px-4 py-2 border text-sm font-medium ${activeClass}">
+                            ${i}
+                        </button>
+                    `;
+                }
+            }
+            
+            container.innerHTML = html;
+
+            // Update Prev/Next Buttons state
+            const prevBtn = document.getElementById('btn-prev');
+            const nextBtn = document.getElementById('btn-next');
+            if(prevBtn) prevBtn.disabled = listState.page === 1;
+            if(nextBtn) nextBtn.disabled = listState.page === totalPages || totalPages === 0;
+        }
+
+        function goToPage(page) {
+            listState.page = page;
+            renderCourseList();
+            document.getElementById('view-courses').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ================= List Action Logic =================
+        function toggleListLike(event, code) {
+            event.stopPropagation();
+            if (!isLogged()) {
+                openLoginModal();
+                return;
+            }
+
+            const course = courses.find(c => c.code === code);
+            if (course) {
+                course.isLiked = !course.isLiked;
+                course.likes += course.isLiked ? 1 : -1;
+                renderCourseList(); // Re-render to update UI
+            }
+        }
+
+        function toggleListFavorite(event, code) {
+            event.stopPropagation();
+            if (!isLogged()) {
+                openLoginModal();
+                return;
+            }
+
+            const course = courses.find(c => c.code === code);
+            if (course) {
+                course.isFavorited = !course.isFavorited;
+                course.favorites += course.isFavorited ? 1 : -1;
+                renderCourseList(); // Re-render to update UI
+            }
+        }
+
         // 6. 课程详情逻辑
         function openCourseDetail(event, courseCode) {
             event.preventDefault();
@@ -621,12 +1098,26 @@
             document.getElementById('detail-units').textContent = detail.units;
             document.getElementById('detail-desc').textContent = detail.desc;
             
+            // Render Teaching Staff
+            document.getElementById('detail-lecturer').textContent = detail.lecturer;
+            
+            const tutorsContainer = document.getElementById('detail-tutors');
+            if (detail.tutors && detail.tutors.length > 0) {
+                tutorsContainer.innerHTML = detail.tutors.map(t => `
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-200 text-gray-800">
+                        ${t}
+                    </span>
+                `).join('');
+            } else {
+                tutorsContainer.innerHTML = '<span class="text-xs text-gray-400">None</span>';
+            }
+            
             // Handle Prereq array
             const prereqContainer = document.getElementById('detail-prereq');
             if (Array.isArray(detail.prereq) && detail.prereq.length > 0) {
                  prereqContainer.innerHTML = detail.prereq.map(p => 
                     `<span class="cursor-pointer bg-indigo-100 text-primary hover:cursor-pointer border border-indigo-300 rounded-md px-2.5 py-0.5 text-xs font-medium transition" onclick="openCourseDetail(event, '${p}')">${p}</span>`
-                 ).join(', ');
+                 ).join(' ');
             } else {
                 prereqContainer.textContent = 'None';
             }
@@ -638,6 +1129,23 @@
             updateRatingBar('grading', detail.ratings.grading);
             updateRatingBar('fun', detail.ratings.fun);
 
+            // 8. Update Sidebar Actions State
+            const likeBtn = document.getElementById('detail-action-like');
+            const bookmarkBtn = document.getElementById('detail-action-bookmark');
+            
+            // Reset Classes
+            likeBtn.className = 'w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 hover:border-red-500 hover:scale-110 transition group';
+            bookmarkBtn.className = 'w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-yellow-500 hover:border-yellow-500 hover:scale-110 transition group';
+
+            if (detail.isLiked) {
+                 likeBtn.classList.remove('text-gray-400', 'border-gray-100');
+                 likeBtn.classList.add('text-red-500', 'border-red-500');
+            }
+            if (detail.isBookmarked) {
+                 bookmarkBtn.classList.remove('text-gray-400', 'border-gray-100');
+                 bookmarkBtn.classList.add('text-yellow-500', 'border-yellow-500');
+            }
+            
             // Populate Reviews
             renderReviews(detail.reviews);
 
@@ -647,6 +1155,77 @@
             window.scrollTo(0, 0);
         }
 
+        function toggleCourseLike(btn) {
+            if (!isLogged()) {
+                openLoginModal();
+                return;
+            }
+            
+            // Toggle Visual State
+            if (btn.classList.contains('text-red-500')) {
+                // Unlike
+                btn.classList.remove('text-red-500', 'border-red-500');
+                btn.classList.add('text-gray-400', 'border-gray-100');
+            } else {
+                // Like
+                btn.classList.remove('text-gray-400', 'border-gray-100');
+                btn.classList.add('text-red-500', 'border-red-500');
+                
+                // Add animation effect
+                const icon = btn.querySelector('i');
+                icon.classList.add('animate-ping');
+                setTimeout(() => icon.classList.remove('animate-ping'), 300);
+            }
+        }
+
+        function toggleCourseBookmark(btn) {
+            if (!isLogged()) {
+                openLoginModal();
+                return;
+            }
+            
+            if (btn.classList.contains('text-yellow-500')) {
+                 // Unbookmark
+                 btn.classList.remove('text-yellow-500', 'border-yellow-500');
+                 btn.classList.add('text-gray-400', 'border-gray-100');
+            } else {
+                 // Bookmark
+                 btn.classList.remove('text-gray-400', 'border-gray-100');
+                 btn.classList.add('text-yellow-500', 'border-yellow-500');
+                 
+                 // Add animation
+                 const icon = btn.querySelector('i');
+                 icon.classList.add('animate-bounce');
+                 setTimeout(() => icon.classList.remove('animate-bounce'), 1000);
+            }
+        }
+        
+        function toggleReviewLike(btn, count) {
+             if (!isLogged()) {
+                openLoginModal();
+                return;
+            }
+            
+            const icon = btn.querySelector('i');
+            const text = btn.innerText; // " 有用 (12)"
+            
+            if (btn.classList.contains('text-primary')) {
+                // Unlike
+                btn.classList.remove('text-primary', 'font-bold');
+                btn.classList.add('text-gray-500');
+                icon.className = 'ph ph-thumbs-up mr-1 text-lg';
+            } else {
+                // Like
+                btn.classList.remove('text-gray-500');
+                btn.classList.add('text-primary', 'font-bold');
+                icon.className = 'ph-fill ph-thumbs-up mr-1 text-lg';
+                
+                // Animation
+                icon.classList.add('animate-bounce');
+                setTimeout(() => icon.classList.remove('animate-bounce'), 500);
+            }
+        }
+
         function updateRatingBar(type, data) {
             document.getElementById(`detail-${type}-val`).textContent = data.text;
             // Map 1-5 to percentage 0-100%
@@ -654,14 +1233,196 @@
             document.getElementById(`detail-${type}-bar`).style.width = `${percentage}%`;
         }
 
-        function renderReviews(reviews) {
-            const container = document.getElementById('detail-reviews-list');
-            if (reviews.length === 0) {
-                container.innerHTML = '<p class="text-gray-500 text-center py-8">暂无评价，快来抢沙发吧！</p>';
+        // ================= Reply System Logic =================
+        const EMOJIS = ['😀', '😂', '😍', '🤔', '😭', '👍', '👎', '🎉', '🔥', '💯', '👻', '👀', '🚀', '❤️', '🎓'];
+
+        function toggleReplyBox(btn, reviewId) {
+            if (!isLogged()) {
+                openLoginModal();
                 return;
             }
 
-            container.innerHTML = reviews.map(review => `
+            const box = document.getElementById(`reply-box-${reviewId}`);
+            if (!box) return;
+
+            if (box.classList.contains('hidden')) {
+                // Show
+                box.classList.remove('hidden');
+                // Render if empty
+                if (!box.innerHTML.trim()) {
+                    renderReplyBox(box, reviewId);
+                }
+                // Focus textarea
+                setTimeout(() => {
+                    const textarea = box.querySelector('textarea');
+                    if (textarea) textarea.focus();
+                }, 100);
+            } else {
+                // Hide
+                box.classList.add('hidden');
+            }
+        }
+
+        function renderReplyBox(container, reviewId) {
+            container.innerHTML = `
+                <div class="bg-white border border-gray-200 rounded-lg p-3 shadow-sm relative">
+                    <textarea 
+                        id="reply-input-${reviewId}"
+                        rows="4" 
+                        class="w-full text-sm text-gray-700 border-none resize-none placeholder-gray-400 focus-visible:outline-none"
+                        placeholder="平等表达，友善交流..."
+                        oninput="updateReplyCharCount(this, '${reviewId}')"
+                    ></textarea>
+                    
+                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
+                        <div class="relative">
+                            <button onclick="toggleEmojiPicker('${reviewId}')" class="text-gray-400 hover:text-yellow-500 transition p-1 rounded-full hover:bg-gray-100">
+                                <i class="ph-bold ph-smiley text-xl"></i>
+                            </button>
+                            <!-- Emoji Picker -->
+                            <div id="emoji-picker-${reviewId}" class="hidden absolute z-20 bottom-full left-0 mb-2 bg-white border border-gray-200 shadow-xl rounded-lg p-2 w-64">
+                                <div class="grid grid-cols-5 gap-1">
+                                    ${EMOJIS.map(emoji => `
+                                        <button onclick="insertEmoji('${emoji}', '${reviewId}')" class="hover:bg-gray-100 p-1.5 rounded text-lg transition">
+                                            ${emoji}
+                                        </button>
+                                    `).join('')}
+                                </div>
+                                <div class="absolute -bottom-1 left-3 w-2 h-2 bg-white border-b border-r border-gray-200 transform rotate-45"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            <span id="char-count-${reviewId}" class="text-xs text-gray-400">0 / 1000</span>
+                            <button onclick="submitReply('${reviewId}')" class="flex items-center bg-primary hover:bg-secondary text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                <i class="ph-bold ph-paper-plane-right mr-1.5"></i> 发送
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Close emoji picker when clicking outside
+            document.addEventListener('click', (e) => {
+                const picker = document.getElementById(`emoji-picker-${reviewId}`);
+                const btn = e.target.closest(`button[onclick="toggleEmojiPicker('${reviewId}')"]`);
+                const insidePicker = e.target.closest(`#emoji-picker-${reviewId}`);
+                
+                if (picker && !picker.classList.contains('hidden') && !btn && !insidePicker) {
+                    picker.classList.add('hidden');
+                }
+            });
+        }
+
+        function updateReplyCharCount(textarea, reviewId) {
+            const count = textarea.value.length;
+            const counter = document.getElementById(`char-count-${reviewId}`);
+            const btn = textarea.closest('.bg-white').querySelector('button[onclick^="submitReply"]');
+            
+            counter.textContent = `${count} / 1000`;
+            
+            if (count > 1000) {
+                counter.classList.add('text-red-500');
+                counter.classList.remove('text-gray-400');
+                btn.disabled = true;
+            } else {
+                counter.classList.remove('text-red-500');
+                counter.classList.add('text-gray-400');
+                btn.disabled = count === 0; // Disable if empty
+            }
+        }
+
+        function toggleEmojiPicker(reviewId) {
+            const picker = document.getElementById(`emoji-picker-${reviewId}`);
+            if (picker) {
+                picker.classList.toggle('hidden');
+            }
+        }
+
+        function insertEmoji(emoji, reviewId) {
+            const textarea = document.getElementById(`reply-input-${reviewId}`);
+            if (textarea) {
+                const start = textarea.selectionStart;
+                const end = textarea.selectionEnd;
+                const text = textarea.value;
+                
+                textarea.value = text.substring(0, start) + emoji + text.substring(end);
+                textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+                textarea.focus();
+                
+                // Trigger input event to update char count
+                textarea.dispatchEvent(new Event('input'));
+                
+                // Close picker
+                document.getElementById(`emoji-picker-${reviewId}`).classList.add('hidden');
+            }
+        }
+
+        function submitReply(reviewId) {
+            const textarea = document.getElementById(`reply-input-${reviewId}`);
+            const content = textarea.value.trim();
+            
+            if (!content) return;
+            
+            // Mock submission
+            alert(`回复发送成功：${content}`);
+            
+            // Clear input
+            textarea.value = '';
+            updateReplyCharCount(textarea, reviewId);
+            
+            // Hide box
+            toggleReplyBox(null, reviewId);
+        }
+
+        function renderReviews(reviews) {
+            const list = document.getElementById('detail-reviews-list');
+            if (!reviews || reviews.length === 0) {
+                list.innerHTML = '<p class="text-gray-500 text-center py-8">暂无评价，快来抢沙发吧！</p>';
+                return;
+            }
+            
+            list.innerHTML = reviews.map(review => {
+                // Generate rating stars
+                const fullStars = Math.floor(review.rating);
+                const hasHalfStar = review.rating % 1 !== 0;
+                let starsHtml = '';
+                for (let i = 0; i < 5; i++) {
+                    if (i < fullStars) {
+                        starsHtml += '<i class="ph-fill ph-star text-yellow-400 text-sm"></i>';
+                    } else if (i === fullStars && hasHalfStar) {
+                         starsHtml += '<i class="ph-fill ph-star-half text-yellow-400 text-sm"></i>';
+                    } else {
+                         starsHtml += '<i class="ph-fill ph-star text-gray-300 text-sm"></i>';
+                    }
+                }
+
+                // Generate replies HTML
+                let repliesHtml = '';
+                if (review.replies && review.replies.length > 0) {
+                    repliesHtml = `
+                        <div class="mt-4 bg-gray-50 rounded-lg p-4 space-y-3">
+                            ${review.replies.map(reply => `
+                                <div class="flex items-start space-x-3 mb-6 last:mb-0">
+                                    <div class="flex-shrink-0">
+                                        <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
+                                            ${reply.user.charAt(0)}
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="flex items-center justify-between">
+                                            <span class="text-sm font-bold text-gray-900">${reply.user}</span>
+                                            <span class="text-xs text-gray-500">${reply.date}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mt-2">${reply.content}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                }
+
+                return `
                 <div class="flex space-x-4">
                     <div class="flex-shrink-0">
                         <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
@@ -669,24 +1430,47 @@
                         </div>
                     </div>
                     <div class="flex-grow">
+                        <!-- Header: User info + Date -->
                         <div class="flex items-center justify-between mb-1">
                             <h4 class="text-sm font-bold text-gray-900">
-															<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 mr-2">
-                                ${review.term}
-                              </span>
-															${review.user}
-														</h4>
+								<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 mr-2">
+                                  ${review.term}
+                                </span>
+								${review.user}
+							</h4>
                             <span class="text-xs text-gray-500">${review.date}</span>
                         </div>
+
+                        <!-- Rating Row -->
+                        <div class="flex items-center mb-2 space-x-2">
+                             <div class="flex items-center">
+                                ${starsHtml}
+                             </div>
+                             <span class="text-sm font-bold text-gray-900">${review.rating.toFixed(1)}</span>
+                        </div>
+
+                        <!-- Review Content -->
                         <p class="text-sm text-gray-600 mb-3">${review.content}</p>
-                        <div class="flex items-center space-x-4">
-                            <button class="flex items-center text-xs text-gray-500 hover:text-primary transition">
-                                <i class="ph ph-thumbs-up mr-1 text-lg"></i> 有用 (${review.likes})
+
+                        <!-- Action Row -->
+                        <div class="flex items-center space-x-6">
+                            <button onclick="toggleReviewLike(this, ${review.likes})" class="flex items-center text-xs transition ${review.isLiked ? 'text-primary font-bold' : 'text-gray-500 hover:text-primary'}">
+                                <i class="${review.isLiked ? 'ph-fill' : 'ph'} ph-thumbs-up mr-1 text-lg"></i> 有用 (${review.likes})
+                            </button>
+                            <button onclick="toggleReplyBox(this, '${review.id}')" class="flex items-center text-xs text-gray-500 hover:text-primary transition">
+                                <i class="ph ph-chat-circle mr-1 text-lg"></i> 回复 (${review.replies ? review.replies.length : 0})
                             </button>
                         </div>
+
+                        <!-- Reply Input Box Container -->
+                        <div id="reply-box-${review.id}" class="hidden mt-4 mb-4 transition-all duration-300 ease-in-out"></div>
+
+                        <!-- Nested Replies -->
+                        ${repliesHtml}
                     </div>
                 </div>
-            `).join('');
+                <div class="border-b border-gray-100 last:border-0"></div>
+            `}).join('');
         }
         
         // 7. 模态框控制
