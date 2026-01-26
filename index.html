@@ -762,16 +762,25 @@
 										<div class="space-y-3">
 											<div>
 												<div class="flex justify-between text-xs text-gray-600 mb-1">
-													<span>工作量 (Workload)</span>
-													<span id="detail-workload-val">繁重</span>
+													<span>课程难度 (Difficulty)</span>
+													<span id="detail-difficulty-val">适中</span>
 												</div>
 												<div class="w-full bg-white rounded-full h-2">
-													<div class="bg-indigo-500 h-2 rounded-full" style="width: 80%" id="detail-workload-bar"></div>
+													<div class="bg-red-500 h-2 rounded-full" style="width: 50%" id="detail-difficulty-bar"></div>
 												</div>
 											</div>
 											<div>
 												<div class="flex justify-between text-xs text-gray-600 mb-1">
-													<span>给分 (Grading)</span>
+													<span>作业多少 (Homework)</span>
+													<span id="detail-homework-val">繁重</span>
+												</div>
+												<div class="w-full bg-white rounded-full h-2">
+													<div class="bg-indigo-500 h-2 rounded-full" style="width: 80%" id="detail-homework-bar"></div>
+												</div>
+											</div>
+											<div>
+												<div class="flex justify-between text-xs text-gray-600 mb-1">
+													<span>给分好坏 (Grading)</span>
 													<span id="detail-grading-val">适中</span>
 												</div>
 												<div class="w-full bg-white rounded-full h-2">
@@ -780,11 +789,11 @@
 											</div>
 											<div>
 												<div class="flex justify-between text-xs text-gray-600 mb-1">
-													<span>趣味性 (Fun)</span>
-													<span id="detail-fun-val">有趣</span>
+													<span>收获大小 (Harvest)</span>
+													<span id="detail-harvest-val">很大</span>
 												</div>
 												<div class="w-full bg-white rounded-full h-2">
-													<div class="bg-yellow-500 h-2 rounded-full" style="width: 90%" id="detail-fun-bar"></div>
+													<div class="bg-yellow-500 h-2 rounded-full" style="width: 90%" id="detail-harvest-bar"></div>
 												</div>
 											</div>
 										</div>
@@ -1371,9 +1380,10 @@
                 isLiked: true,
                 isBookmarked: true,
                 ratings: {
-                    workload: { val: 4.5, text: '繁重' },
+                    difficulty: { val: 4.0, text: '较难' },
+                    homework: { val: 4.5, text: '繁重' },
                     grading: { val: 3.0, text: '适中' },
-                    fun: { val: 4.8, text: '有趣' }
+                    harvest: { val: 4.8, text: '很大' }
                 },
                 reviews: [
                     { 
@@ -1413,9 +1423,10 @@
                 isLiked: true,
                 isBookmarked: true,
                 ratings: {
-                    workload: { val: 3.5, text: '适中' },
+                    difficulty: { val: 3.5, text: '适中' },
+                    homework: { val: 3.5, text: '适中' },
                     grading: { val: 2.0, text: '杀手' },
-                    fun: { val: 2.5, text: '一般' }
+                    harvest: { val: 2.5, text: '一般' }
                 },
                 reviews: [
                     { 
@@ -1454,9 +1465,10 @@
                 tutors: ['Tom'],
                 statusColor: 'bg-green-100 text-green-800',
                 ratings: {
-                    workload: { val: 2.0, text: '轻松' },
+                    difficulty: { val: 2.0, text: '简单' },
+                    homework: { val: 2.0, text: '轻松' },
                     grading: { val: 4.8, text: '水课' },
-                    fun: { val: 4.5, text: '有趣' }
+                    harvest: { val: 4.5, text: '有趣' }
                 },
                 reviews: [
                     { 
@@ -1482,9 +1494,10 @@
             tutors: [],
             statusColor: 'bg-gray-100 text-gray-800',
             ratings: {
-                workload: { val: 3.0, text: '适中' },
+                difficulty: { val: 3.0, text: '适中' },
+                homework: { val: 3.0, text: '适中' },
                 grading: { val: 3.0, text: '适中' },
-                fun: { val: 3.0, text: '一般' }
+                harvest: { val: 3.0, text: '一般' }
             },
             reviews: []
         };
@@ -1952,9 +1965,10 @@
                 const detail = courseDetailsMap[course.code] || defaultDetail;
                 
                 // Get Rating Dimensions
-                const workload = detail.ratings?.workload || { val: 3.0, text: 'N/A' };
+                const difficulty = detail.ratings?.difficulty || { val: 3.0, text: 'N/A' };
+                const homework = detail.ratings?.homework || { val: 3.0, text: 'N/A' };
                 const grading = detail.ratings?.grading || { val: 3.0, text: 'N/A' };
-                const fun = detail.ratings?.fun || { val: 3.0, text: 'N/A' };
+                const harvest = detail.ratings?.harvest || { val: 3.0, text: 'N/A' };
                 
                 // Truncate desc
                 const desc = detail.desc.length > 80 ? detail.desc.substring(0, 80) + '...' : detail.desc;
@@ -2010,11 +2024,11 @@
                          <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-xs text-gray-600">
                              <div class="flex justify-between">
                                  <span>课程难度:</span>
-                                 <span class="font-medium text-gray-900">${workload.text} (${workload.val})</span>
+                                 <span class="font-medium text-gray-900">${difficulty.text} (${difficulty.val})</span>
                              </div>
                              <div class="flex justify-between">
                                  <span>作业多少:</span>
-                                 <span class="font-medium text-gray-900">${workload.text} (${workload.val})</span>
+                                 <span class="font-medium text-gray-900">${homework.text} (${homework.val})</span>
                              </div>
                              <div class="flex justify-between">
                                  <span>给分好坏:</span>
@@ -2022,7 +2036,7 @@
                              </div>
                              <div class="flex justify-between">
                                  <span>收获大小:</span>
-                                 <span class="font-medium text-gray-900">${fun.text} (${fun.val})</span>
+                                 <span class="font-medium text-gray-900">${harvest.text} (${harvest.val})</span>
                              </div>
                          </div>
                          
@@ -2169,9 +2183,10 @@
             document.getElementById('detail-rating').textContent = course.rating;
 
             // Update Rating Bars
-            updateRatingBar('workload', detail.ratings.workload);
+            updateRatingBar('difficulty', detail.ratings.difficulty);
+            updateRatingBar('homework', detail.ratings.homework);
             updateRatingBar('grading', detail.ratings.grading);
-            updateRatingBar('fun', detail.ratings.fun);
+            updateRatingBar('harvest', detail.ratings.harvest);
 
             // 8. Update Sidebar Actions State
             const likeBtn = document.getElementById('detail-action-like');
