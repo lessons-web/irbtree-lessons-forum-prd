@@ -66,7 +66,7 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen font-sans antialiased text-gray-900">
+<body class="bg-gray-50 min-h-screen font-sans antialiased text-gray-900 flex flex-col">
     <!-- Review Drawer & Overlay -->
     <div id="review-drawer-overlay" onclick="closeReviewDrawer()" class="fixed inset-0 bg-black/30 z-[60]"></div>
     <div id="review-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white z-[70] flex flex-col shadow-2xl">
@@ -347,16 +347,145 @@
 
         <!-- Write Review View -->
         <div id="view-review" class="tab-content hidden">
-             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">写点评</h2>
-                <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
-                    <p class="text-lg text-gray-600 mb-4">分享你的课程体验...</p>
-                    <ul class="list-disc list-inside space-y-2 text-gray-500">
-                        <li>课程搜索与关联</li>
-                        <li>多维度打分（难度、实用性、趣味性）</li>
-                        <li>富文本评价编辑器</li>
-                        <li>匿名/实名发布选项</li>
-                    </ul>
+             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Step 1: Course Selection -->
+                <div class="bg-white shadow-lg rounded-xl p-6 border border-gray-100 mb-4 transition-all duration-300">
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph-bold ph-magnifying-glass text-gray-400"></i>
+                        </div>
+                        <input type="text" id="review-course-search" 
+                            class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out" 
+                            placeholder="输入课程代码 (如 COMP9900)"
+                            oninput="handleReviewCourseSearch(this.value)"
+                            autocomplete="off">
+                        
+                        <!-- Dropdown Results -->
+                        <div id="review-course-dropdown" class="absolute z-10 mt-1 w-full bg-white shadow-xl max-h-60 rounded-lg py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm hidden">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Selected Course Info (Hidden by default) -->
+                    <div id="review-selected-course-info" class="hidden mt-4 bg-indigo-50 p-5 rounded-lg border border-indigo-100 flex-col gap-4">
+                        <!-- Header: Icon + Code/Name + Reselect -->
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div id="review-course-icon" class="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-primary">
+                                    <!-- Dynamic Icon -->
+                                </div>
+                                <div>
+                                    <h3 id="review-course-title" class="text-lg font-bold text-gray-900"></h3>
+                                    <p id="review-course-name" class="text-sm text-gray-600"></p>
+                                </div>
+                            </div>
+                            <button onclick="clearReviewCourseSelection()" class="text-sm text-gray-500 hover:text-red-500 font-medium transition flex items-center">
+                                <i class="ph-bold ph-x-circle mr-1"></i> 重新选择
+                            </button>
+                        </div>
+                        
+                        <!-- Divider -->
+                        <hr class="border-indigo-200">
+           
+                        <!-- Details Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                            <div class="col-span-1 md:col-span-2">
+                                <span class="font-semibold text-gray-700 block mb-1">课程简介</span>
+                                <p id="review-course-desc" class="text-gray-600 text-xs leading-relaxed"></p>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">任课教师：</span>
+                                <span id="review-course-lecturer" class="text-gray-600"></span>
+                            </div>
+                            <div>
+                                <span class="font-semibold text-gray-700">助教：</span>
+                                <span id="review-course-tutors" class="text-gray-600"></span>
+                            </div>
+                            <div class="col-span-1 md:col-span-2 flex items-center">
+                                <span class="font-semibold text-gray-700 mr-2">前置要求：</span>
+                                <div id="review-course-prereq" class="flex flex-wrap gap-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Review Form (Hidden by default) -->
+                <div id="review-form-container" class="bg-white shadow-lg rounded-xl px-6 py-4 border border-gray-100 hidden transition-all duration-300">
+                     <!-- Term Selection -->
+                     <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">修读学期</label>
+                        <select id="page-term-select" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
+                            <option>2025 T1</option>
+                            <option>2024 T3</option>
+                            <option>2024 T2</option>
+                            <option>2024 T1</option>
+                            <option>多学期</option>
+                        </select>
+                    </div>
+
+                    <!-- Ratings -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <!-- Difficulty -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-sm font-medium text-gray-700">工作量 (Workload)</label>
+                                <span class="text-xs text-gray-400">轻松 -> 繁重</span>
+                            </div>
+                            <div class="flex space-x-2" id="page-star-rating-difficulty"></div>
+                        </div>
+                        <!-- Homework -->
+                        <div>
+                             <div class="flex items-center justify-between mb-1">
+                                <label class="block text-sm font-medium text-gray-700">给分 (Grading)</label>
+                                <span class="text-xs text-gray-400">杀手 -> 水课</span>
+                            </div>
+                            <div class="flex space-x-2" id="page-star-rating-grading"></div>
+                        </div>
+                         <!-- Grading (Wait, mixed up labels in mock? Let's stick to standard 4 dimensions if needed, or just 3 as per prev request. The JS has 4: difficulty, homework, grading, harvest. Let's map them.) -->
+                         <!-- Actually user requested: Workload, Grading, Fun (3 dimensions) in detail page request, but JS has 4. Let's adapt to JS: difficulty, homework, grading, harvest. -->
+                         <!-- Wait, let's look at the JS I wrote: drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 }; -->
+                         <!-- I will render 4 dimensions to match JS -->
+                        
+                        <!-- Homework/Assignment Load? Let's just use "Task Load" -->
+                        <div>
+                             <div class="flex items-center justify-between mb-1">
+                                <label class="block text-sm font-medium text-gray-700">作业难度 (Homework)</label>
+                                <span class="text-xs text-gray-400">简单 -> 困难</span>
+                            </div>
+                            <div class="flex space-x-2" id="page-star-rating-homework"></div>
+                        </div>
+
+                         <!-- Harvest -->
+                         <div>
+                             <div class="flex items-center justify-between mb-1">
+                                <label class="block text-sm font-medium text-gray-700">收获 (Harvest)</label>
+                                <span class="text-xs text-gray-400">没用 -> 实用</span>
+                            </div>
+                            <div class="flex space-x-2" id="page-star-rating-harvest"></div>
+                        </div>
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">详细评价</label>
+                        <textarea id="page-review-content" rows="4" class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border border-gray-300 rounded-md p-3" placeholder="这门课的体验如何？给学弟学妹们一些建议吧..."></textarea>
+                         <div class="mt-2 flex justify-between items-center">
+                            <button type="button" class="text-gray-400 hover:text-gray-600">
+                                <i class="ph-bold ph-smiley text-xl"></i>
+                            </button>
+                            <span class="text-xs text-gray-400">0 / 1000</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+                        <button onclick="resetPageReview()" class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            重置
+                        </button>
+                        <button onclick="submitPageReview()" class="px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            提交评价
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -521,92 +650,103 @@
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <h1 class="text-3xl font-bold text-gray-900 mb-8">写点评</h1>
             
-            <!-- Course Selector -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-200 mb-8">
-                <label class="block text-sm font-medium text-gray-700 mb-2">选择课程</label>
-                <div class="relative">
-                    <input type="text" id="review-course-search" 
-                        class="block w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary"
-                        placeholder="搜索课程代码 (e.g. COMP9021)..."
-                        oninput="handleReviewCourseSearch(this.value)">
-                    <div id="review-course-dropdown" class="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm hidden">
-                        <!-- Options populated by JS -->
+            <!-- Card 1: Course Selection & Details -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 overflow-hidden">
+                <div class="p-6 border-b border-gray-100">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">选择课程</label>
+                    <div class="relative">
+                        <input type="text" id="review-course-search" 
+                            class="block w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition"
+                            placeholder="搜索课程代码 (e.g. COMP9021)..."
+                            oninput="handleReviewCourseSearch(this.value)">
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="ph ph-magnifying-glass text-gray-400"></i>
+                        </div>
+                        <div id="review-course-dropdown" class="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm hidden">
+                            <!-- Options populated by JS -->
+                        </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Review Form Container (Initially Hidden) -->
-            <div id="review-form-container" class="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hidden">
-                <!-- Course Info Header -->
-                <div class="flex items-center justify-between mb-8 pb-8 border-b border-gray-100">
+                
+                <!-- Selected Course Details (Hidden by default) -->
+                <div id="review-selected-course-info" class="bg-indigo-50 px-6 py-4 hidden flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-primary" id="review-course-icon">
                             <i class="ph-bold ph-book"></i>
                         </div>
                         <div>
                             <h2 class="text-xl font-bold text-gray-900" id="review-course-title">COMP9021</h2>
-                            <p class="text-sm text-gray-500" id="review-course-name">Principles of Programming</p>
+                            <p class="text-sm text-gray-600" id="review-course-name">Principles of Programming</p>
                         </div>
                     </div>
+                    <button onclick="clearReviewCourseSelection()" class="text-sm text-gray-500 hover:text-red-500 font-medium transition">
+                        重新选择
+                    </button>
                 </div>
+            </div>
 
-                <!-- Term Selection -->
-                <div class="mb-8">
-                    <div class="flex items-center mb-3 border-l-4 border-primary pl-3">
-                        <span class="text-lg font-bold text-gray-900">选学期</span>
-                        <span class="text-red-500 ml-1">*</span>
+            <!-- Card 2: Review Form (Hidden initially) -->
+            <div id="review-form-container" class="bg-white rounded-xl shadow-sm border border-gray-200 hidden">
+                <div class="p-8">
+                    <!-- Term Selection -->
+                    <div class="mb-8">
+                        <div class="flex items-center mb-3 border-l-4 border-primary pl-3">
+                            <span class="text-lg font-bold text-gray-900">选学期</span>
+                            <span class="text-red-500 ml-1">*</span>
+                        </div>
+                        <select id="page-term-select" class="w-full sm:w-40 bg-indigo-50 border border-indigo-100 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5">
+                            <option value="多学期">多学期</option>
+                            <option value="2024T3">2024 T3</option>
+                            <option value="2024T2">2024 T2</option>
+                            <option value="2024T1">2024 T1</option>
+                            <option value="2023T3">2023 T3</option>
+                        </select>
                     </div>
-                    <select id="page-term-select" class="w-full sm:w-40 bg-red-50 border border-red-100 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5">
-                        <option value="多学期">多学期</option>
-                        <option value="2024T3">2024 T3</option>
-                        <option value="2024T2">2024 T2</option>
-                        <option value="2024T1">2024 T1</option>
-                        <option value="2023T3">2023 T3</option>
-                    </select>
-                </div>
 
-                <!-- Ratings -->
-                <div class="mb-8">
-                    <div class="flex items-center mb-4 border-l-4 border-primary pl-3">
-                        <span class="text-lg font-bold text-gray-900">打评分</span>
-                        <span class="text-red-500 ml-1">*</span>
+                    <!-- Ratings -->
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4 border-l-4 border-primary pl-3">
+                            <span class="text-lg font-bold text-gray-900">打评分</span>
+                            <span class="text-red-500 ml-1">*</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                            <!-- Difficulty -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">课程难度</span>
+                                <div class="flex items-center space-x-1" id="page-star-rating-difficulty"></div>
+                            </div>
+                            <!-- Homework -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">作业多少</span>
+                                <div class="flex items-center space-x-1" id="page-star-rating-homework"></div>
+                            </div>
+                            <!-- Grading -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">给分好坏</span>
+                                <div class="flex items-center space-x-1" id="page-star-rating-grading"></div>
+                            </div>
+                            <!-- Harvest -->
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm font-medium text-gray-700">收获大小</span>
+                                <div class="flex items-center space-x-1" id="page-star-rating-harvest"></div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                        <!-- Difficulty -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">课程难度</span>
-                            <div class="flex items-center space-x-1" id="page-star-rating-difficulty"></div>
-                        </div>
-                        <!-- Homework -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">作业多少</span>
-                            <div class="flex items-center space-x-1" id="page-star-rating-homework"></div>
-                        </div>
-                        <!-- Grading -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">给分好坏</span>
-                            <div class="flex items-center space-x-1" id="page-star-rating-grading"></div>
-                        </div>
-                        <!-- Harvest -->
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium text-gray-700">收获大小</span>
-                            <div class="flex items-center space-x-1" id="page-star-rating-harvest"></div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Review Content -->
-                <div class="mb-8">
-                    <div class="flex items-center mb-4 border-l-4 border-primary pl-3">
-                        <span class="text-lg font-bold text-gray-900">写评论</span>
+                    <!-- Review Content -->
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4 border-l-4 border-primary pl-3">
+                            <span class="text-lg font-bold text-gray-900">写评论</span>
+                        </div>
+                        <textarea id="page-review-content" rows="12" class="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-200 focus:ring-primary focus:border-primary resize-none" placeholder="分享你的课程体验..."></textarea>
                     </div>
-                    <textarea id="page-review-content" rows="12" class="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-200 focus:ring-primary focus:border-primary resize-none" placeholder="分享你的课程体验..."></textarea>
-                </div>
 
-                <!-- Actions -->
-                <div class="flex items-center justify-end space-x-4">
-                    <button onclick="submitPageReview()" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition transform hover:scale-105">提交</button>
+                    <!-- Actions -->
+                    <div class="flex items-center justify-end space-x-4 pt-4 border-t border-gray-100">
+                        <button onclick="resetPageReview()" class="text-gray-500 hover:text-gray-700 font-medium px-4 py-2 text-sm transition">重置</button>
+                        <button onclick="submitPageReview()" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition transform hover:scale-105">提交</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -681,13 +821,15 @@
     <!-- ================= JavaScript Logic ================= -->
     <script>
         // 1. 模拟数据
+        const colorPalette = ['bg-red-100', 'bg-orange-100', 'bg-amber-100', 'bg-green-100', 'bg-teal-100', 'bg-blue-100', 'bg-indigo-100', 'bg-purple-100', 'bg-pink-100'];
+        
         let courses = [
-            { code: 'COMP9021', name: 'Principles of Programming', uni: 'UNSW', rating: 4.8, reviews: 124, tags: ['硬核', '作业多', '干货满满'] },
-            { code: 'FINC5001', name: 'Capital Markets and Corporate Finance', uni: 'USYD', rating: 3.2, reviews: 89, tags: ['挂科率高', '理论课'] },
-            { code: 'MKTG1001', name: 'Marketing Principles', uni: 'USYD', rating: 4.5, reviews: 210, tags: ['水课', '给分好', '有趣'] },
-            { code: 'FIT9136', name: 'Algorithms and Programming', uni: 'Monash', rating: 4.0, reviews: 56, tags: ['Python', '基础课'] },
-            { code: 'ACCT1101', name: 'Accounting for Decision Making', uni: 'UQ', rating: 3.8, reviews: 102, tags: ['考试难', '必修'] },
-            { code: 'ELEC1111', name: 'Electrical Circuit Fundamentals', uni: 'UNSW', rating: 2.9, reviews: 45, tags: ['天书', '慎选'] },
+            { code: 'COMP9021', name: 'Principles of Programming', uni: 'UNSW', rating: 4.8, reviews: 124, tags: ['硬核', '作业多', '干货满满'], color: 'bg-blue-100' },
+            { code: 'FINC5001', name: 'Capital Markets and Corporate Finance', uni: 'USYD', rating: 3.2, reviews: 89, tags: ['挂科率高', '理论课'], color: 'bg-red-100' },
+            { code: 'MKTG1001', name: 'Marketing Principles', uni: 'USYD', rating: 4.5, reviews: 210, tags: ['水课', '给分好', '有趣'], color: 'bg-orange-100' },
+            { code: 'FIT9136', name: 'Algorithms and Programming', uni: 'Monash', rating: 4.0, reviews: 56, tags: ['Python', '基础课'], color: 'bg-indigo-100' },
+            { code: 'ACCT1101', name: 'Accounting for Decision Making', uni: 'UQ', rating: 3.8, reviews: 102, tags: ['考试难', '必修'], color: 'bg-green-100' },
+            { code: 'ELEC1111', name: 'Electrical Circuit Fundamentals', uni: 'UNSW', rating: 2.9, reviews: 45, tags: ['天书', '慎选'], color: 'bg-purple-100' },
         ];
         
         // Generate more mock data
@@ -705,6 +847,7 @@
              const favorites = Math.floor(Math.random() * 100) || 1;
              const isLiked = Math.random() > 0.7; // 30% chance
              const isFavorited = Math.random() > 0.8; // 20% chance
+             const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
 
              const tags = [];
              for(let j=0; j<Math.floor(1+Math.random()*3); j++) {
@@ -722,7 +865,8 @@
                     favorites,
                     isLiked,
                     isFavorited,
-                    tags: [...new Set(tags)]
+                    tags: [...new Set(tags)],
+                    color
                 });
              }
         }
@@ -1097,11 +1241,12 @@
                 dropdown.innerHTML = '<div class="px-4 py-2 text-gray-500">未找到相关课程</div>';
             } else {
                 dropdown.innerHTML = filtered.map(c => `
-                    <div class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center" onclick="selectReviewCourse('${c.code}')">
+                    <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex items-center justify-between group transition" onclick="selectReviewCourse('${c.code}')">
                         <div>
-                            <span class="font-bold text-gray-900">${c.code}</span>
+                            <span class="font-bold text-gray-900 group-hover:text-primary">${c.code}</span>
                             <span class="text-sm text-gray-500 ml-2 truncate">${c.name}</span>
                         </div>
+                        <i class="ph-bold ph-caret-right text-gray-300 group-hover:text-primary"></i>
                     </div>
                 `).join('');
             }
@@ -1112,28 +1257,71 @@
             const course = courses.find(c => c.code === code);
             if (!course) return;
 
-            // Hide dropdown
+            // Hide dropdown and clear search input
             document.getElementById('review-course-dropdown').classList.add('hidden');
-            document.getElementById('review-course-search').value = `${course.code} - ${course.name}`;
-
-            // Show Form
-            document.getElementById('review-form-container').classList.remove('hidden');
+            document.getElementById('review-course-search').value = '';
             
-            // Populate Info
+            // Show Selected Course Info Card
+            const selectedInfo = document.getElementById('review-selected-course-info');
+            selectedInfo.classList.remove('hidden');
+            selectedInfo.classList.add('flex'); // Add flex display
+            
             document.getElementById('review-course-title').innerText = course.code;
             document.getElementById('review-course-name').innerText = course.name;
             
+            // Set icon color dynamically
+            const colorClass = (course.color || 'bg-primary').replace('bg-', '').replace('-100', '') + '-500';
             const iconContainer = document.getElementById('review-course-icon');
-            // Simple color logic reuse or default
-            iconContainer.className = `w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-primary`; 
+            iconContainer.className = `w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-${colorClass}`; 
             iconContainer.innerHTML = '<i class="ph-bold ph-book"></i>';
 
+            // Populate Additional Details
+            const details = courseDetailsMap[course.code] || defaultDetail;
+            document.getElementById('review-course-desc').innerText = details.desc;
+            document.getElementById('review-course-lecturer').innerText = details.lecturer || 'N/A';
+            document.getElementById('review-course-tutors').innerText = details.tutors && details.tutors.length ? details.tutors.join(', ') : 'N/A';
+            
+            const prereqContainer = document.getElementById('review-course-prereq');
+            if (details.prereq && details.prereq.length > 0) {
+                prereqContainer.innerHTML = details.prereq.map(p => 
+                    `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800">${p}</span>`
+                ).join('');
+            } else {
+                prereqContainer.innerHTML = '<span class="text-gray-400 text-xs">无前置要求</span>';
+            }
+
+            // Show Review Form Card
+            document.getElementById('review-form-container').classList.remove('hidden');
+            
             // Reset Page Ratings
             pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
             renderInteractiveStars('star-rating-difficulty', 'difficulty', 'page');
             renderInteractiveStars('star-rating-homework', 'homework', 'page');
             renderInteractiveStars('star-rating-grading', 'grading', 'page');
             renderInteractiveStars('star-rating-harvest', 'harvest', 'page');
+        }
+
+        function clearReviewCourseSelection() {
+            // Hide selected info
+            const selectedInfo = document.getElementById('review-selected-course-info');
+            selectedInfo.classList.add('hidden');
+            selectedInfo.classList.remove('flex');
+            
+            // Hide review form
+            document.getElementById('review-form-container').classList.add('hidden');
+            
+            // Focus search input
+            document.getElementById('review-course-search').focus();
+        }
+
+        function resetPageReview() {
+             document.getElementById('page-term-select').value = '多学期';
+             document.getElementById('page-review-content').value = '';
+             pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
+             renderInteractiveStars('star-rating-difficulty', 'difficulty', 'page');
+             renderInteractiveStars('star-rating-homework', 'homework', 'page');
+             renderInteractiveStars('star-rating-grading', 'grading', 'page');
+             renderInteractiveStars('star-rating-harvest', 'harvest', 'page');
         }
         
         function handleSearch() {
