@@ -1000,7 +1000,7 @@
 					<h1 class="text-3xl font-bold text-gray-900 mb-8">写点评</h1>
 			
 					<!-- Card 1: Course Selection & Details -->
-					<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8 overflow-hidden">
+					<div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
 						<div class="p-6 border-b border-gray-100">
 							<label class="block text-sm font-medium text-gray-700 mb-2">选择课程</label>
 							<div class="relative">
@@ -1018,22 +1018,39 @@
 						</div>
 			
 						<!-- Selected Course Details (Hidden by default) -->
-						<div id="review-selected-course-info" class="bg-indigo-50 px-6 py-4 hidden flex items-center justify-between">
-							<div class="flex items-center">
-								<div
-									class="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-primary"
-									id="review-course-icon">
-									<i class="ph-bold ph-book"></i>
+						<div id="review-selected-course-info" class="bg-indigo-50 px-6 py-4 hidden flex-col rounded-b-xl">
+							<div class="flex items-center justify-between mb-3">
+								<div class="flex items-center">
+									<div
+										class="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-primary"
+										id="review-course-icon">
+										<i class="ph-bold ph-book"></i>
+									</div>
+									<div>
+										<h2 class="text-xl font-bold text-gray-900" id="review-course-title">COMP9021</h2>
+										<p class="text-sm text-gray-600" id="review-course-name">Principles of Programming</p>
+									</div>
 								</div>
-								<div>
-									<h2 class="text-xl font-bold text-gray-900" id="review-course-title">COMP9021</h2>
-									<p class="text-sm text-gray-600" id="review-course-name">Principles of Programming</p>
+								<button onclick="clearReviewCourseSelection()"
+									class="text-sm text-gray-500 hover:text-red-500 font-medium transition">
+									重新选择
+								</button>
+							</div>
+
+							<!-- Added Course Details for Script Compatibility -->
+							<div class="border-t border-indigo-100 pt-3">
+								<p class="text-sm text-gray-600 mb-2 line-clamp-2" id="review-course-desc">Course Description...</p>
+								<div class="flex flex-wrap gap-4 text-xs text-gray-500 mb-2">
+									<div><span class="font-bold">Lecturer:</span> <span id="review-course-lecturer">Unknown</span></div>
+									<div><span class="font-bold">Tutors:</span> <span id="review-course-tutors">Unknown</span></div>
+								</div>
+								<div class="flex items-center gap-2 text-xs">
+									<span class="font-bold text-gray-500">Prereqs:</span>
+									<div id="review-course-prereq" class="flex flex-wrap gap-1">
+										<span class="text-gray-400">无前置要求</span>
+									</div>
 								</div>
 							</div>
-							<button onclick="clearReviewCourseSelection()"
-								class="text-sm text-gray-500 hover:text-red-500 font-medium transition">
-								重新选择
-							</button>
 						</div>
 					</div>
 			
@@ -1095,7 +1112,6 @@
 								
 								<!-- Tags Selection -->
 								<div class="mb-4">
-									<span class="text-sm font-medium text-gray-700 block mb-2">选择标签 (Tags)</span>
 									<div class="flex flex-wrap gap-2" id="page-tags-container">
 										<!-- Tag Pool -->
 									</div>
