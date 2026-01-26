@@ -165,7 +165,6 @@
                     <a href="#" onclick="switchTab(event, 'home')" id="nav-home" class="nav-item h-16 flex items-center text-primary font-medium border-b-4 border-primary px-1 pt-1 transition">首页</a>
                     <a href="#" onclick="switchTab(event, 'courses')" id="nav-courses" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">课程列表</a>
                     <a href="#" onclick="switchTab(event, 'review')" id="nav-review" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">写点评</a>
-                    <a href="#" onclick="switchTab(event, 'profile')" id="nav-profile" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">个人中心</a>
                 </nav>
 
                 <!-- Auth Buttons -->
@@ -492,16 +491,170 @@
 
         <!-- Profile View -->
         <div id="view-profile" class="tab-content hidden">
-             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <h2 class="text-3xl font-bold text-gray-900 mb-6">个人中心</h2>
-                <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
-                    <p class="text-lg text-gray-600 mb-4">管理你的账户...</p>
-                    <ul class="list-disc list-inside space-y-2 text-gray-500">
-                        <li>个人资料编辑（头像、昵称、学校）</li>
-                        <li>我的点评记录管理</li>
-                        <li>收藏的课程列表</li>
-                        <li>账户安全设置</li>
-                    </ul>
+             <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <!-- Profile Header Card -->
+                <div class="bg-white shadow rounded-2xl border border-gray-100 mb-6 relative overflow-hidden">
+                    
+                    <div class="relative flex flex-col lg:flex-row px-8 pb-8 pt-8 gap-8">
+                         <!-- Left: Avatar & Basic Info -->
+                         <div class="flex flex-col sm:flex-row items-center flex-grow">
+                             <!-- Avatar -->
+                             <div class="relative flex-shrink-0 mx-auto sm:mx-0">
+                                 <div class="h-28 w-28 rounded-full ring-4 ring-white bg-white p-1 shadow-lg">
+                                    <div class="h-full w-full rounded-full bg-indigo-100 flex items-center justify-center text-4xl font-bold text-primary border border-indigo-200" id="profile-avatar">
+                                        A
+                                    </div>
+                                 </div>
+                             </div>
+                             
+                             <!-- Info -->
+                             <div class="mt-4 sm:mt-0 sm:ml-6 flex-1 text-center sm:text-left mb-2">
+                                 <div class="flex items-center justify-center sm:justify-start space-x-3 mb-1">
+                                     <h1 class="text-3xl font-bold text-gray-900" id="profile-name">Alex Student</h1>
+                                     <!-- Verified Badge -->
+                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 shadow-sm" title="已通过学校邮箱验证">
+                                        <i class="ph-fill ph-seal-check mr-1.5 text-blue-500"></i> UNSW 认证学生
+                                     </span>
+                                 </div>
+                                 <div class="flex items-center justify-center sm:justify-start space-x-4 text-sm text-gray-500 mb-3">
+                                    <span class="flex items-center"><i class="ph-bold ph-student mr-1"></i> Computer Science</span>
+                                    <span class="flex items-center"><i class="ph-bold ph-map-pin mr-1"></i> Sydney, AU</span>
+                                 </div>
+                                 <p class="text-gray-600 text-sm max-w-xl mx-auto sm:mx-0 bg-gray-50 p-2 rounded-lg border border-gray-100 italic">
+                                    "专注 CS 课程评价，主修 AI 方向。希望能帮到更多的学弟学妹，欢迎交流讨论！"
+                                 </p>
+                             </div>
+                         </div>
+            
+                         <!-- Right: Achievements & Actions -->
+                         <div class="flex flex-col items-end gap-4 w-full lg:w-auto">
+                             <!-- Edit Action -->
+                             <div class="absolute top-8 right-8 lg:static">
+                                 <button class="px-5 py-2.5 border border-gray-300 shadow-sm text-sm font-medium rounded-xl text-gray-700 bg-white hover:bg-gray-50 transition flex items-center">
+                                     <i class="ph-bold ph-pencil-simple mr-2"></i> 编辑资料
+                                 </button>
+                             </div>
+
+                             <!-- Achievement Card (Phase 2) -->
+                             <div class="relative w-full lg:w-72 bg-white/80 backdrop-blur-sm border border-yellow-200 rounded-xl p-4 shadow-sm group">
+                                 <!-- Phase 2 Badge -->
+                                 <div class="absolute -top-3 -right-3 bg-gradient-to-r from-orange-400 to-pink-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-md z-10">
+                                     二期规划 • Coming Soon
+                                 </div>
+                                 
+                                 <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
+                                     <i class="ph-fill ph-trophy text-yellow-500 mr-2 text-lg"></i> 个人成就
+                                 </h3>
+                                 
+                                 <div class="space-y-3 opacity-70 group-hover:opacity-100 transition-opacity">
+                                     <!-- Achievement 1 -->
+                                     <div class="flex items-center justify-between">
+                                         <div class="flex items-center">
+                                             <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-3">
+                                                 <i class="ph-fill ph-users"></i>
+                                             </div>
+                                             <div>
+                                                 <div class="text-xs font-bold text-gray-800">社交达人</div>
+                                                 <div class="text-[10px] text-gray-500">粉丝 > 100</div>
+                                             </div>
+                                         </div>
+                                         <div class="text-xs font-bold text-blue-600">LV.2</div>
+                                     </div>
+                                     <!-- Progress -->
+                                     <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                         <div class="bg-blue-500 h-1.5 rounded-full" style="width: 65%"></div>
+                                     </div>
+
+                                     <!-- Achievement 2 -->
+                                     <div class="flex items-center justify-between mt-2">
+                                         <div class="flex items-center">
+                                             <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center mr-3">
+                                                 <i class="ph-fill ph-graduation-cap"></i>
+                                             </div>
+                                             <div>
+                                                 <div class="text-xs font-bold text-gray-800">选课大师</div>
+                                                 <div class="text-[10px] text-gray-500">评论 > 10</div>
+                                             </div>
+                                         </div>
+                                         <div class="text-xs font-bold text-purple-600">LV.1</div>
+                                     </div>
+                                     <!-- Progress -->
+                                     <div class="w-full bg-gray-100 rounded-full h-1.5">
+                                         <div class="bg-purple-500 h-1.5 rounded-full" style="width: 30%"></div>
+                                     </div>
+                                 </div>
+                                 
+                                 <!-- Overlay for disabled state -->
+                                 <div class="absolute inset-0 bg-white/10 cursor-not-allowed" title="该功能正在开发中"></div>
+                             </div>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Bottom Tabs Section -->
+                <div class="bg-white shadow rounded-2xl border border-gray-100 min-h-[600px] flex flex-col">
+                    <!-- Tabs Header -->
+                    <div class="border-b border-gray-200 px-8">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            <button onclick="switchProfileTab('likes')" id="tab-btn-likes" class="profile-tab-btn border-primary text-primary whitespace-nowrap py-5 px-1 border-b-2 font-medium text-sm transition flex items-center">
+                                <i class="ph-bold ph-heart mr-2 text-lg"></i> 我点赞的课程
+                            </button>
+                            <button onclick="switchProfileTab('favorites')" id="tab-btn-favorites" class="profile-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-5 px-1 border-b-2 font-medium text-sm transition flex items-center">
+                                <i class="ph-bold ph-star mr-2 text-lg"></i> 我收藏的课程
+                            </button>
+                            <button onclick="switchProfileTab('replies')" id="tab-btn-replies" class="profile-tab-btn border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-5 px-1 border-b-2 font-medium text-sm transition flex items-center">
+                                <i class="ph-bold ph-chat-circle-text mr-2 text-lg"></i> 相关的回复
+                                <span class="ml-2 bg-red-100 text-red-600 py-0.5 px-2 rounded-full text-xs hidden">3</span>
+                            </button>
+                        </nav>
+                    </div>
+            
+                    <!-- Content -->
+                    <div class="p-8 flex-grow bg-gray-50/50">
+                        <!-- Likes Tab -->
+                        <div id="profile-content-likes" class="space-y-4">
+                            <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Favorites Tab -->
+                        <div id="profile-content-favorites" class="hidden space-y-4">
+                             <!-- Populated by JS -->
+                        </div>
+
+                        <!-- Replies Tab -->
+                        <div id="profile-content-replies" class="hidden space-y-4">
+                             <!-- Static Mock for now -->
+                             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold text-xs">E</div>
+                                        <span class="text-sm font-bold text-gray-900">Eric</span>
+                                        <span class="text-xs text-gray-500">回复了你的评论</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400">2小时前</span>
+                                </div>
+                                <p class="text-gray-600 text-sm pl-10">"感谢你的认可！作业确实有点多，加油！"</p>
+                                <div class="mt-3 ml-10 bg-gray-50 p-3 rounded-lg text-xs text-gray-500 border border-gray-100">
+                                    <span class="font-medium text-gray-700">你的原评:</span> 课程内容非常扎实，Eric老师讲得很好，但是作业量真的很大...
+                                </div>
+                             </div>
+
+                             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">T</div>
+                                        <span class="text-sm font-bold text-gray-900">Tom</span>
+                                        <span class="text-xs text-gray-500">回复了你的评论</span>
+                                    </div>
+                                    <span class="text-xs text-gray-400">昨天</span>
+                                </div>
+                                <p class="text-gray-600 text-sm pl-10">"太惨了兄弟，我也挂了..."</p>
+                                <div class="mt-3 ml-10 bg-gray-50 p-3 rounded-lg text-xs text-gray-500 border border-gray-100">
+                                    <span class="font-medium text-gray-700">你的原评:</span> 理论性很强，考试很难，挂科率确实不低...
+                                </div>
+                             </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1064,17 +1217,35 @@
             if (isLogged()) {
                 const user = JSON.parse(sessionStorage.getItem('irbtree_user'));
                 authSection.innerHTML = `
-                    <div class="flex items-center space-x-3">
+                    <div class="flex items-center space-x-4">
+                        <!-- Notification Icon -->
+                        <button class="relative p-2 rounded-full hover:bg-gray-100 transition text-gray-500 hover:text-primary" title="消息通知">
+                            <i class="ph-bold ph-bell text-xl"></i>
+                            <span class="absolute top-2 right-2 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                        </button>
+
                         <div class="text-right hidden sm:block">
                             <p class="text-sm font-medium text-gray-900">${user.name}</p>
                             <p class="text-xs text-gray-500">学生认证</p>
                         </div>
-                        <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold border border-indigo-200">
-                            ${user.name.charAt(0)}
+                        
+                        <!-- Avatar Dropdown -->
+                        <div class="relative">
+                            <button onclick="toggleUserDropdown(event)" class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold border border-indigo-200 hover:ring-2 hover:ring-offset-2 hover:ring-primary transition" id="user-menu-button">
+                                ${user.name.charAt(0)}
+                            </button>
+                            
+                            <!-- Dropdown Menu -->
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 border border-gray-100 z-50 transform origin-top-right transition-all animate-fade-in-down">
+                                <a href="#" onclick="switchTab(event, 'profile'); toggleUserDropdown(event);" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center transition">
+                                    <i class="ph-bold ph-user mr-3 text-lg"></i> 个人中心
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center transition">
+                                    <i class="ph-bold ph-sign-out mr-3 text-lg"></i> 退出登录
+                                </button>
+                            </div>
                         </div>
-                        <button onclick="handleLogout()" class="text-gray-400 hover:text-gray-600">
-                            <i class="ph-bold ph-sign-out text-xl"></i>
-                        </button>
                     </div>
                 `;
             } else {
@@ -1084,6 +1255,26 @@
                 `;
             }
         }
+
+        function toggleUserDropdown(event) {
+            if (event) event.stopPropagation();
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                dropdown.classList.toggle('hidden');
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            // User Dropdown
+            const userDropdown = document.getElementById('user-dropdown');
+            const userBtn = document.getElementById('user-menu-button');
+            if (userDropdown && !userDropdown.classList.contains('hidden')) {
+                if (!userDropdown.contains(e.target) && !userBtn.contains(e.target)) {
+                    userDropdown.classList.add('hidden');
+                }
+            }
+        });
 
         // 5. 交互处理
         // Tab Switching Logic
@@ -1107,6 +1298,10 @@
             if (selectedView) {
                 selectedView.classList.remove('hidden');
                 selectedView.classList.add('block');
+            }
+
+            if (tabId === 'profile') {
+                renderProfile();
             }
 
             // Update Nav State
@@ -2034,6 +2229,84 @@
                 // 刷新页面或重新加载数据（可选）
                 // window.location.reload(); 
             }, 800);
+        }
+
+        // ================= Profile Logic =================
+        function renderProfile() {
+            if (!isLogged()) return;
+            
+            const user = JSON.parse(sessionStorage.getItem('irbtree_user'));
+            
+            // Render Header Info
+            document.getElementById('profile-name').textContent = user.name;
+            document.getElementById('profile-avatar').textContent = user.name.charAt(0);
+            
+            // Render Lists
+            renderProfileCourseList('profile-content-likes', c => c.isLiked);
+            renderProfileCourseList('profile-content-favorites', c => c.isFavorited);
+        }
+
+        function switchProfileTab(tabName) {
+            // Update Buttons
+            document.querySelectorAll('.profile-tab-btn').forEach(btn => {
+                if (btn.id === `tab-btn-${tabName}`) {
+                    btn.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    btn.classList.add('border-primary', 'text-primary');
+                } else {
+                    btn.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+                    btn.classList.remove('border-primary', 'text-primary');
+                }
+            });
+
+            // Update Content
+            ['likes', 'favorites', 'replies'].forEach(name => {
+                const el = document.getElementById(`profile-content-${name}`);
+                if (name === tabName) {
+                    el.classList.remove('hidden');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        function renderProfileCourseList(containerId, filterFn) {
+            const container = document.getElementById(containerId);
+            const filteredCourses = courses.filter(filterFn);
+            
+            if (filteredCourses.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                            <i class="ph ph-mask-sad text-2xl text-gray-400"></i>
+                        </div>
+                        <p class="text-gray-500">空空如也，去探索一些课程吧！</p>
+                        <button onclick="switchTab(event, 'courses')" class="mt-4 text-primary hover:underline">去浏览课程</button>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filteredCourses.map(course => `
+                <div class="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition flex items-center justify-between group cursor-pointer" onclick="openCourseDetail(event, '${course.code}')">
+                    <div class="flex items-center">
+                        <div class="h-12 w-12 rounded-lg ${course.color || 'bg-indigo-100'} flex items-center justify-center text-gray-700 font-bold mr-4">
+                            ${course.code.substring(0, 4)}
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900 group-hover:text-primary transition">${course.code}</h4>
+                            <p class="text-sm text-gray-500 truncate w-48 sm:w-auto">${course.name}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-6">
+                        <div class="hidden sm:flex items-center text-yellow-500">
+                             <span class="font-bold mr-1">${course.rating}</span>
+                             <i class="ph-fill ph-star"></i>
+                        </div>
+                        <i class="ph-bold ph-caret-right text-gray-300 group-hover:text-primary"></i>
+                    </div>
+                </div>
+            `).join('');
         }
 
         function handleLogout() {
