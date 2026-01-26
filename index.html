@@ -125,6 +125,14 @@
 							<span class="text-sm font-medium text-gray-700">收获大小</span>
 							<div class="flex items-center space-x-1" id="star-rating-harvest"></div>
 						</div>
+						
+						<!-- Tags Selection -->
+						<div class="col-span-1 sm:col-span-2 mt-2 pt-4 border-t border-gray-100">
+							<span class="text-sm font-medium text-gray-700 block mb-3">选择标签 (Tags)</span>
+							<div class="flex flex-wrap gap-2" id="drawer-tags-container">
+								<!-- Tag Pool -->
+							</div>
+						</div>
 					</div>
 				</div>
 				<!-- Review Content -->
@@ -349,158 +357,6 @@
 				</div>
 			</div>
 
-        <!-- Write Review View -->
-			<div id="view-review" class="tab-content hidden">
-				<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-					<!-- Step 1: Course Selection -->
-					<div class="bg-white shadow-lg rounded-xl p-6 border border-gray-100 mb-4 transition-all duration-300">
-						<div class="relative">
-							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<i class="ph-bold ph-magnifying-glass text-gray-400"></i>
-							</div>
-							<input type="text" id="review-course-search"
-								class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition duration-150 ease-in-out"
-								placeholder="输入课程代码 (如 COMP9900)" oninput="handleReviewCourseSearch(this.value)" autocomplete="off">
-			
-							<!-- Dropdown Results -->
-							<div id="review-course-dropdown"
-								class="absolute z-10 mt-1 w-full bg-white shadow-xl max-h-60 rounded-lg py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm hidden">
-								<!-- Populated by JS -->
-							</div>
-						</div>
-			
-						<!-- Selected Course Info (Hidden by default) -->
-						<div id="review-selected-course-info"
-							class="hidden mt-4 bg-indigo-50 p-5 rounded-lg border border-indigo-100 flex-col gap-4">
-							<!-- Header: Icon + Code/Name + Reselect -->
-							<div class="flex items-center justify-between">
-								<div class="flex items-center">
-									<div id="review-course-icon"
-										class="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold mr-4 bg-primary">
-										<!-- Dynamic Icon -->
-									</div>
-									<div>
-										<h3 id="review-course-title" class="text-lg font-bold text-gray-900"></h3>
-										<p id="review-course-name" class="text-sm text-gray-600"></p>
-									</div>
-								</div>
-								<button onclick="clearReviewCourseSelection()"
-									class="text-sm text-gray-500 hover:text-red-500 font-medium transition flex items-center">
-									<i class="ph-bold ph-x-circle mr-1"></i> 重新选择
-								</button>
-							</div>
-			
-							<!-- Divider -->
-							<hr class="border-indigo-200">
-			
-							<!-- Details Grid -->
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4 text-sm">
-								<div class="col-span-1 md:col-span-2">
-									<span class="font-semibold text-gray-700 block mb-1">课程简介</span>
-									<p id="review-course-desc" class="text-gray-600 text-xs leading-relaxed"></p>
-								</div>
-								<div>
-									<span class="font-semibold text-gray-700">任课教师：</span>
-									<span id="review-course-lecturer" class="text-gray-600"></span>
-								</div>
-								<div>
-									<span class="font-semibold text-gray-700">助教：</span>
-									<span id="review-course-tutors" class="text-gray-600"></span>
-								</div>
-								<div class="col-span-1 md:col-span-2 flex items-center">
-									<span class="font-semibold text-gray-700 mr-2">前置要求：</span>
-									<div id="review-course-prereq" class="flex flex-wrap gap-2"></div>
-								</div>
-							</div>
-						</div>
-					</div>
-			
-					<!-- Step 2: Review Form (Hidden by default) -->
-					<div id="review-form-container"
-						class="bg-white shadow-lg rounded-xl px-6 py-4 border border-gray-100 hidden transition-all duration-300">
-						<!-- Term Selection -->
-						<div class="mb-4">
-							<label class="block text-sm font-medium text-gray-700 mb-2">修读学期</label>
-							<select id="page-term-select"
-								class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md">
-								<option>2025 T1</option>
-								<option>2024 T3</option>
-								<option>2024 T2</option>
-								<option>2024 T1</option>
-								<option>多学期</option>
-							</select>
-						</div>
-			
-						<!-- Ratings -->
-						<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-							<!-- Difficulty -->
-							<div>
-								<div class="flex items-center justify-between mb-1">
-									<label class="block text-sm font-medium text-gray-700">工作量 (Workload)</label>
-									<span class="text-xs text-gray-400">轻松 -> 繁重</span>
-								</div>
-								<div class="flex space-x-2" id="page-star-rating-difficulty"></div>
-							</div>
-							<!-- Homework -->
-							<div>
-								<div class="flex items-center justify-between mb-1">
-									<label class="block text-sm font-medium text-gray-700">给分 (Grading)</label>
-									<span class="text-xs text-gray-400">杀手 -> 水课</span>
-								</div>
-								<div class="flex space-x-2" id="page-star-rating-grading"></div>
-							</div>
-							<!-- Grading (Wait, mixed up labels in mock? Let's stick to standard 4 dimensions if needed, or just 3 as per prev request. The JS has 4: difficulty, homework, grading, harvest. Let's map them.) -->
-							<!-- Actually user requested: Workload, Grading, Fun (3 dimensions) in detail page request, but JS has 4. Let's adapt to JS: difficulty, homework, grading, harvest. -->
-							<!-- Wait, let's look at the JS I wrote: drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 }; -->
-							<!-- I will render 4 dimensions to match JS -->
-			
-							<!-- Homework/Assignment Load? Let's just use "Task Load" -->
-							<div>
-								<div class="flex items-center justify-between mb-1">
-									<label class="block text-sm font-medium text-gray-700">作业难度 (Homework)</label>
-									<span class="text-xs text-gray-400">简单 -> 困难</span>
-								</div>
-								<div class="flex space-x-2" id="page-star-rating-homework"></div>
-							</div>
-			
-							<!-- Harvest -->
-							<div>
-								<div class="flex items-center justify-between mb-1">
-									<label class="block text-sm font-medium text-gray-700">收获 (Harvest)</label>
-									<span class="text-xs text-gray-400">没用 -> 实用</span>
-								</div>
-								<div class="flex space-x-2" id="page-star-rating-harvest"></div>
-							</div>
-						</div>
-			
-						<!-- Comment -->
-						<div class="mb-4">
-							<label class="block text-sm font-medium text-gray-700 mb-2">详细评价</label>
-							<textarea id="page-review-content" rows="4"
-								class="shadow-sm focus:ring-primary focus:border-primary block w-full sm:text-sm border border-gray-300 rounded-md p-3"
-								placeholder="这门课的体验如何？给学弟学妹们一些建议吧..."></textarea>
-							<div class="mt-2 flex justify-between items-center">
-								<button type="button" class="text-gray-400 hover:text-gray-600">
-									<i class="ph-bold ph-smiley text-xl"></i>
-								</button>
-								<span class="text-xs text-gray-400">0 / 1000</span>
-							</div>
-						</div>
-			
-						<!-- Actions -->
-						<div class="flex justify-end space-x-3 pt-4 border-t border-gray-100">
-							<button onclick="resetPageReview()"
-								class="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-								重置
-							</button>
-							<button onclick="submitPageReview()"
-								class="px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
-								提交评价
-							</button>
-						</div>
-					</div>
-				</div>
-			</div>
 
 			<!-- Profile View -->
 			<div id="view-profile" class="tab-content hidden">
@@ -746,6 +602,12 @@
 										<div class="mt-4">
 											<span class="text-sm font-medium text-gray-900">前置要求：</span>
 											<span class="text-sm text-primary" id="detail-prereq">COMP9031</span>
+										</div>
+										<div class="mt-4">
+											<span class="text-sm font-medium text-gray-900">课程标签：</span>
+											<span class="inline-flex gap-2 mt-2" id="detail-tags">
+												<!-- Tags populated by JS -->
+											</span>
 										</div>
 									</div>
 			
@@ -1058,15 +920,27 @@
 											</div>
 											<div class="space-y-2">
 												<div class="flex items-center text-xs">
-													<span class="w-16 text-gray-500">Workload</span>
+													<span class="w-16 text-gray-500">Difficulty</span>
 													<div class="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
-														<div class="h-full bg-indigo-500" style="width: 80%"></div>
+														<div class="h-full bg-red-500" style="width: 0%" id="mp-detail-difficulty-bar"></div>
+													</div>
+												</div>
+												<div class="flex items-center text-xs">
+													<span class="w-16 text-gray-500">Homework</span>
+													<div class="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
+														<div class="h-full bg-indigo-500" style="width: 0%" id="mp-detail-homework-bar"></div>
 													</div>
 												</div>
 												<div class="flex items-center text-xs">
 													<span class="w-16 text-gray-500">Grading</span>
 													<div class="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
-														<div class="h-full bg-green-500" style="width: 60%"></div>
+														<div class="h-full bg-green-500" style="width: 0%" id="mp-detail-grading-bar"></div>
+													</div>
+												</div>
+												<div class="flex items-center text-xs">
+													<span class="w-16 text-gray-500">Harvest</span>
+													<div class="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
+														<div class="h-full bg-yellow-500" style="width: 0%" id="mp-detail-harvest-bar"></div>
 													</div>
 												</div>
 											</div>
@@ -1218,6 +1092,15 @@
 								<div class="flex items-center mb-4 border-l-4 border-primary pl-3">
 									<span class="text-lg font-bold text-gray-900">写评论</span>
 								</div>
+								
+								<!-- Tags Selection -->
+								<div class="mb-4">
+									<span class="text-sm font-medium text-gray-700 block mb-2">选择标签 (Tags)</span>
+									<div class="flex flex-wrap gap-2" id="page-tags-container">
+										<!-- Tag Pool -->
+									</div>
+								</div>
+
 								<textarea id="page-review-content" rows="12"
 									class="block p-4 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-200 focus:ring-primary focus:border-primary resize-none"
 									placeholder="分享你的课程体验..."></textarea>
@@ -1536,12 +1419,9 @@
         }
 
         function getTagColor(tag) {
-            const goodTags = ['干货满满', '水课', '给分好', '有趣'];
-            const badTags = ['挂科率高', '考试难', '天书', '慎选', '作业多'];
-            
-            if (goodTags.includes(tag)) {
+            if (GOOD_TAGS.includes(tag)) {
                 return 'bg-green-100 text-green-800';
-            } else if (badTags.includes(tag)) {
+            } else if (BAD_TAGS.includes(tag)) {
                 return 'bg-red-100 text-red-800';
             }
             return 'bg-gray-100 text-gray-800';
@@ -1677,8 +1557,8 @@
         }
 
         // ================= Review Logic =================
-        let drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
-        let pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
+        let drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
+        let pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
         
         function openReviewDrawer(courseCode) {
             if (!isLogged()) {
@@ -1693,16 +1573,59 @@
             // Reset form
             document.getElementById('drawer-term-select').value = '多学期';
             document.getElementById('drawer-review-content').value = '';
-            drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
+            drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
             
             renderInteractiveStars('star-rating-difficulty', 'difficulty', 'drawer');
             renderInteractiveStars('star-rating-homework', 'homework', 'drawer');
             renderInteractiveStars('star-rating-grading', 'grading', 'drawer');
             renderInteractiveStars('star-rating-harvest', 'harvest', 'drawer');
+            renderTagSelection('drawer-tags-container', drawerRatings.tags);
 
             document.getElementById('review-drawer').classList.add('open');
             document.getElementById('review-drawer-overlay').classList.add('open');
             document.body.style.overflow = 'hidden';
+        }
+
+        const TAG_POOL = [
+            '内容实用', '干货满满', '老师nice', '作业多', 
+            '考试难', '给分好', '水课', '点名', 
+            '有录屏', 'Group Work', '必须预习', '比较枯燥', 
+            '理论性强', '实践为主'
+        ];
+
+        const GOOD_TAGS = ['干货满满', '水课', '给分好', '有趣', '内容实用', '老师nice', '有录屏', '实践为主'];
+        const BAD_TAGS = ['挂科率高', '考试难', '天书', '慎选', '作业多', '点名', '比较枯燥', '必须预习'];
+
+        function renderTagSelection(containerId, selectedTags) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            container.innerHTML = TAG_POOL.map(tag => {
+                const isSelected = selectedTags.includes(tag);
+                const baseClass = "cursor-pointer px-3 py-1.5 rounded-full text-xs font-medium border transition select-none";
+                
+                let activeClass = "bg-gray-100 text-gray-800"; // Default Neutral (Gray)
+                if (GOOD_TAGS.includes(tag)) {
+                    activeClass = "bg-green-100 border-green-600 text-green-800";
+                } else if (BAD_TAGS.includes(tag)) {
+                    activeClass = "bg-red-100 border-red-600 text-red-800";
+                }
+
+                const inactiveClass = "bg-white text-gray-600 border-gray-600 hover:border-gray-800 hover:text-gray-900";
+                return `<span onclick="toggleReviewTag('${containerId}', '${tag}')" class="${baseClass} ${isSelected ? activeClass : inactiveClass}">${tag}</span>`;
+            }).join('');
+        }
+
+        function toggleReviewTag(containerId, tag) {
+            const context = containerId === 'drawer-tags-container' ? 'drawer' : 'page';
+            const targetRatings = context === 'drawer' ? drawerRatings : pageRatings;
+            
+            if (targetRatings.tags.includes(tag)) {
+                targetRatings.tags = targetRatings.tags.filter(t => t !== tag);
+            } else {
+                targetRatings.tags.push(tag);
+            }
+            renderTagSelection(containerId, targetRatings.tags);
         }
 
         function closeReviewDrawer() {
@@ -1829,11 +1752,12 @@
             document.getElementById('review-form-container').classList.remove('hidden');
             
             // Reset Page Ratings
-            pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
+            pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
             renderInteractiveStars('star-rating-difficulty', 'difficulty', 'page');
             renderInteractiveStars('star-rating-homework', 'homework', 'page');
             renderInteractiveStars('star-rating-grading', 'grading', 'page');
             renderInteractiveStars('star-rating-harvest', 'harvest', 'page');
+            renderTagSelection('page-tags-container', pageRatings.tags);
         }
 
         function clearReviewCourseSelection() {
@@ -1852,11 +1776,12 @@
         function resetPageReview() {
              document.getElementById('page-term-select').value = '多学期';
              document.getElementById('page-review-content').value = '';
-             pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0 };
+             pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
              renderInteractiveStars('star-rating-difficulty', 'difficulty', 'page');
              renderInteractiveStars('star-rating-homework', 'homework', 'page');
              renderInteractiveStars('star-rating-grading', 'grading', 'page');
              renderInteractiveStars('star-rating-harvest', 'harvest', 'page');
+             renderTagSelection('page-tags-container', pageRatings.tags);
         }
         
         function handleSearch() {
@@ -2180,6 +2105,16 @@
                 prereqContainer.textContent = 'None';
             }
             
+            // Handle Tags
+            const tagsContainer = document.getElementById('detail-tags');
+            if (course.tags && course.tags.length > 0) {
+                tagsContainer.innerHTML = course.tags.map(tag => `
+                    <span class="px-2 py-1 rounded text-xs font-medium ${getTagColor(tag)}">${tag}</span>
+                `).join('');
+            } else {
+                tagsContainer.innerHTML = '<span class="text-xs text-gray-500">无标签</span>';
+            }
+
             document.getElementById('detail-rating').textContent = course.rating;
 
             // Update Rating Bars
@@ -2748,6 +2683,15 @@
             document.getElementById('mp-detail-rating').textContent = course.rating;
             document.getElementById('mp-detail-desc').textContent = detail.desc;
             
+            // Update Ratings
+            if (detail.ratings) {
+                const getPct = (val) => (val / 5) * 100 + '%';
+                document.getElementById('mp-detail-difficulty-bar').style.width = getPct(detail.ratings.difficulty.val);
+                document.getElementById('mp-detail-homework-bar').style.width = getPct(detail.ratings.homework.val);
+                document.getElementById('mp-detail-grading-bar').style.width = getPct(detail.ratings.grading.val);
+                document.getElementById('mp-detail-harvest-bar').style.width = getPct(detail.ratings.harvest.val);
+            }
+
             // Tags
             const tagsContainer = document.getElementById('mp-detail-tags');
             tagsContainer.innerHTML = course.tags.map(t => `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">${t}</span>`).join('');
