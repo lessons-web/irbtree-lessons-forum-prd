@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBTree - 小程序原型</title>
+    <link rel="icon" href="forum.svg" type="image/svg+xml">
+    <!-- 引入 TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置 Tailwind 主题色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        secondary: '#6366F1', // Indigo-500
+                        surface: '#F9FAFB', // Gray-50
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- 引入图标库 (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* 隐藏滚动条但允许滚动 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased text-gray-900">
+
+    <!-- Mini Program Prototype View -->
+    <div id="view-miniprogram" class="min-h-screen flex items-center justify-center p-8">
+        <!-- Phone Mockup -->
+        <div class="relative mx-auto border-gray-900 bg-gray-900 border-[14px] rounded-[2.5rem] h-[750px] w-[375px] shadow-xl flex flex-col overflow-hidden">
+            <div class="h-[32px] w-[3px] bg-gray-800 absolute -left-[17px] top-[72px] rounded-l-lg"></div>
+            <div class="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[124px] rounded-l-lg"></div>
+            <div class="h-[46px] w-[3px] bg-gray-800 absolute -left-[17px] top-[178px] rounded-l-lg"></div>
+            <div class="h-[64px] w-[3px] bg-gray-800 absolute -right-[17px] top-[142px] rounded-r-lg"></div>
+            <div class="rounded-[2rem] overflow-hidden w-full h-full bg-white relative flex flex-col">
+                
+                <!-- Status Bar -->
+                <div class="h-10 bg-white w-full absolute top-0 z-50 flex items-center justify-between px-6 pt-2">
+                        <span class="text-xs font-bold text-gray-900">9:41</span>
+                        <div class="flex items-center space-x-1.5">
+                            <i class="ph-fill ph-cell-signal-full text-xs"></i>
+                            <i class="ph-fill ph-wifi-high text-xs"></i>
+                            <i class="ph-fill ph-battery-full text-xs"></i>
+                        </div>
+                </div>
+
+                <!-- Login Screen -->
+                <div id="mp-login-view" class="absolute inset-0 z-40 bg-white flex flex-col items-center justify-center p-6 transition-transform duration-300">
+                        <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white text-3xl mb-6 shadow-lg shadow-indigo-200">
+                        <i class="ph-bold ph-tree-structure"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 mb-1">欢迎回来</h2>
+                    <p class="text-sm text-gray-500 mb-8">登录 IRBTree 小程序</p>
+                    
+                    <div class="w-full space-y-4">
+                        <input type="text" value="student" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="账号">
+                        <input type="password" value="123456" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary focus:outline-none" placeholder="密码">
+                        <button onclick="handleMPLogin()" class="w-full bg-primary text-white py-3 rounded-xl font-medium shadow-md active:scale-95 transition">
+                            登录
+                        </button>
+                    </div>
+                    <p class="mt-6 text-xs text-gray-400">点击登录直接进入演示模式</p>
+                </div>
+
+                <!-- Main App Content (Hidden until logged in) -->
+                <div id="mp-main-view" class="flex-1 flex flex-col h-full hidden relative">
+                    <!-- Scrollable Area -->
+                    <div class="flex-1 overflow-y-auto no-scrollbar pt-12 pb-4 bg-gray-50" id="mp-scroll-container">
+                        
+                        <!-- Tab 1: Course List -->
+                        <div id="mp-tab-courses" class="px-4">
+                            <!-- Search -->
+                            <div class="bg-white p-2 rounded-full shadow-sm border border-gray-100 mb-4 flex items-center sticky top-0 z-10">
+                                <i class="ph ph-magnifying-glass text-gray-400 ml-2 mr-2"></i>
+                                <input type="text" placeholder="搜索课程..." class="flex-1 text-sm outline-none text-gray-700 placeholder-gray-400">
+                            </div>
+                            
+                            <!-- Hot Courses -->
+                            <h3 class="text-sm font-bold text-gray-900 mb-3 flex items-center">
+                                <i class="ph-fill ph-fire text-orange-500 mr-1"></i> 热门推荐
+                            </h3>
+                            <div class="space-y-3" id="mp-course-list">
+                                <!-- JS Populated -->
+                            </div>
+                        </div>
+
+                        <!-- Tab 2: Write Review -->
+                        <div id="mp-tab-review" class="px-4 hidden">
+                            <h3 class="text-lg font-bold text-gray-900 mb-4">写点评</h3>
+                            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-4">
+                                <label class="block text-xs font-medium text-gray-700 mb-2">课程代码</label>
+                                <select class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-primary mb-4">
+                                    <option>请选择课程...</option>
+                                    <option>COMP9021</option>
+                                    <option>FINC5001</option>
+                                    <option>MKTG1001</option>
+                                </select>
+                                
+                                <label class="block text-xs font-medium text-gray-700 mb-2">评价内容</label>
+                                <textarea rows="5" class="w-full bg-gray-50 border border-gray-200 rounded-lg p-2 text-sm outline-none focus:border-primary resize-none" placeholder="写下你的真实感受..."></textarea>
+                                
+                                <button onclick="alert('小程序演示：评价提交成功！')" class="mt-4 w-full bg-primary text-white py-2.5 rounded-lg text-sm font-medium shadow-sm">提交评价</button>
+                            </div>
+                        </div>
+
+                        <!-- Tab 3: Profile -->
+                        <div id="mp-tab-profile" class="hidden">
+                            <!-- Header -->
+                            <div class="bg-white pb-6 pt-2 px-6 mb-2">
+                                <div class="flex items-center">
+                                    <div class="h-16 w-16 rounded-full bg-indigo-100 flex items-center justify-center text-primary text-2xl font-bold border border-indigo-200 mr-4">
+                                        A
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-bold text-gray-900">Alex</h3>
+                                        <p class="text-xs text-gray-500">UNSW • Computer Science</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Menu List -->
+                            <div class="bg-white mt-2">
+                                <div class="px-4">
+                                    <div class="py-3 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-lg bg-orange-100 text-orange-500 flex items-center justify-center mr-3">
+                                                <i class="ph-fill ph-star"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-700">我的收藏</span>
+                                        </div>
+                                        <i class="ph-bold ph-caret-right text-gray-300"></i>
+                                    </div>
+                                    <div class="py-3 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-lg bg-red-100 text-red-500 flex items-center justify-center mr-3">
+                                                <i class="ph-fill ph-heart"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-700">我的点赞</span>
+                                        </div>
+                                        <i class="ph-bold ph-caret-right text-gray-300"></i>
+                                    </div>
+                                    <div class="py-3 flex items-center justify-between border-b border-gray-50 active:bg-gray-50">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-500 flex items-center justify-center mr-3">
+                                                <i class="ph-fill ph-chat-circle-text"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-700">我的评价</span>
+                                        </div>
+                                        <i class="ph-bold ph-caret-right text-gray-300"></i>
+                                    </div>
+                                    <div class="py-3 flex items-center justify-between active:bg-gray-50">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-lg bg-gray-100 text-gray-500 flex items-center justify-center mr-3">
+                                                <i class="ph-fill ph-gear"></i>
+                                            </div>
+                                            <span class="text-sm font-medium text-gray-700">设置</span>
+                                        </div>
+                                        <i class="ph-bold ph-caret-right text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Tab Bar -->
+                    <div class="h-[83px] bg-white border-t border-gray-100 flex items-start justify-around pt-3 pb-8 px-2 shrink-0 relative z-30 rounded-b-[2rem]">
+                        <button onclick="switchMPTab('courses')" class="flex flex-col items-center justify-center w-16 space-y-1 group">
+                            <i id="mp-icon-courses" class="ph-fill ph-books text-2xl text-primary transition"></i>
+                            <span id="mp-text-courses" class="text-[10px] font-medium text-primary">课程</span>
+                        </button>
+                        <button onclick="switchMPTab('review')" class="flex flex-col items-center justify-center w-16 space-y-1 group">
+                            <i id="mp-icon-review" class="ph-bold ph-pencil-simple text-2xl text-gray-400 transition group-hover:text-gray-600"></i>
+                            <span id="mp-text-review" class="text-[10px] font-medium text-gray-400 group-hover:text-gray-600">写评</span>
+                        </button>
+                        <button onclick="switchMPTab('profile')" class="flex flex-col items-center justify-center w-16 space-y-1 group">
+                            <i id="mp-icon-profile" class="ph-bold ph-user text-2xl text-gray-400 transition group-hover:text-gray-600"></i>
+                            <span id="mp-text-profile" class="text-[10px] font-medium text-gray-400 group-hover:text-gray-600">我的</span>
+                        </button>
+                    </div>
+
+                    <!-- Course Detail View (Slide Over) -->
+                    <div id="mp-course-detail-view" class="absolute inset-0 bg-white z-40 transform translate-x-full transition-transform duration-300 flex flex-col">
+                        <!-- Header -->
+                        <div class="h-12 flex items-center px-4 border-b border-gray-100 mt-10 bg-white">
+                            <button onclick="closeMPCourseDetail()" class="text-gray-500 hover:text-gray-900 p-2 -ml-2">
+                                <i class="ph-bold ph-caret-left text-xl"></i>
+                            </button>
+                            <h3 class="text-base font-bold text-gray-900 ml-2" id="mp-detail-title">Course Code</h3>
+                        </div>
+                        
+                        <!-- Content -->
+                        <div class="flex-1 overflow-y-auto p-4 pb-20 no-scrollbar">
+                            <!-- Basic Info -->
+                            <div class="mb-6">
+                                <h1 class="text-2xl font-bold text-gray-900 mb-1" id="mp-detail-code">COMP9021</h1>
+                                <h2 class="text-sm text-gray-500 mb-3" id="mp-detail-name">Principles of Programming</h2>
+                                <div class="flex flex-wrap gap-2 mb-4" id="mp-detail-tags">
+                                    <!-- Tags -->
+                                </div>
+                                <p class="text-sm text-gray-600 leading-relaxed bg-gray-50 p-3 rounded-lg" id="mp-detail-desc">
+                                    Description...
+                                </p>
+                            </div>
+
+                            <!-- Ratings -->
+                            <div class="mb-6 bg-indigo-50 rounded-xl p-4">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-bold text-gray-700">综合评分</span>
+                                    <div class="flex items-center text-yellow-500">
+                                        <span class="text-xl font-bold mr-1" id="mp-detail-rating">4.8</span>
+                                        <i class="ph-fill ph-star"></i>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center text-xs">
+                                        <span class="w-16 text-gray-500">Workload</span>
+                                        <div class="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
+                                            <div class="h-full bg-indigo-500" style="width: 80%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center text-xs">
+                                        <span class="w-16 text-gray-500">Grading</span>
+                                        <div class="flex-1 h-1.5 bg-white rounded-full overflow-hidden">
+                                            <div class="h-full bg-green-500" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Reviews List -->
+                            <div>
+                                <h3 class="text-sm font-bold text-gray-900 mb-3">精选评价</h3>
+                                <div class="space-y-4" id="mp-detail-reviews">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Floating Action Button -->
+                        <div class="absolute bottom-6 right-6">
+                            <button onclick="openMPReviewDrawer()" class="w-12 h-12 bg-primary text-white rounded-full shadow-lg flex items-center justify-center hover:scale-105 transition active:scale-95">
+                                <i class="ph-bold ph-pencil-simple text-xl"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Comment Drawer (Slide Up) -->
+                    <div id="mp-drawer-overlay" class="absolute inset-0 bg-black/50 z-50 hidden opacity-0 transition-opacity duration-300" onclick="closeMPReviewDrawer()"></div>
+                    <div id="mp-review-drawer" class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 transform translate-y-full transition-transform duration-300 max-h-[80%] flex flex-col">
+                        <div class="p-4 border-b border-gray-100 flex items-center justify-between">
+                            <button onclick="closeMPReviewDrawer()" class="text-gray-400">取消</button>
+                            <h3 class="font-bold text-gray-900">写评价</h3>
+                            <button onclick="submitMPReview()" class="text-primary font-bold">发布</button>
+                        </div>
+                        <div class="p-4 overflow-y-auto">
+                            <div class="flex justify-center space-x-2 mb-6">
+                                <i class="ph-bold ph-star text-3xl text-gray-300 hover:text-yellow-400 cursor-pointer"></i>
+                                <i class="ph-bold ph-star text-3xl text-gray-300 hover:text-yellow-400 cursor-pointer"></i>
+                                <i class="ph-bold ph-star text-3xl text-gray-300 hover:text-yellow-400 cursor-pointer"></i>
+                                <i class="ph-bold ph-star text-3xl text-gray-300 hover:text-yellow-400 cursor-pointer"></i>
+                                <i class="ph-bold ph-star text-3xl text-gray-300 hover:text-yellow-400 cursor-pointer"></i>
+                            </div>
+                            <textarea class="w-full bg-gray-50 rounded-xl p-3 text-sm focus:outline-none focus:ring-1 focus:ring-primary h-32 resize-none" placeholder="展开说说这门课的体验..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logic -->
+    <script>
+        // 1. Mock Data (Duplicated for standalone page)
+        const colorPalette = ['bg-red-100', 'bg-orange-100', 'bg-amber-100', 'bg-green-100', 'bg-teal-100', 'bg-blue-100', 'bg-indigo-100', 'bg-purple-100', 'bg-pink-100'];
+        
+        let courses = [
+            { code: 'COMP9021', name: 'Principles of Programming', uni: 'UNSW', rating: 4.8, reviews: 124, tags: ['硬核', '作业多', '干货满满'], color: 'bg-blue-100' },
+            { code: 'FINC5001', name: 'Capital Markets and Corporate Finance', uni: 'USYD', rating: 3.2, reviews: 89, tags: ['挂科率高', '理论课'], color: 'bg-red-100' },
+            { code: 'MKTG1001', name: 'Marketing Principles', uni: 'USYD', rating: 4.5, reviews: 210, tags: ['水课', '给分好', '有趣'], color: 'bg-orange-100' },
+            { code: 'FIT9136', name: 'Algorithms and Programming', uni: 'Monash', rating: 4.0, reviews: 56, tags: ['Python', '基础课'], color: 'bg-indigo-100' },
+            { code: 'ACCT1101', name: 'Accounting for Decision Making', uni: 'UQ', rating: 3.8, reviews: 102, tags: ['考试难', '必修'], color: 'bg-green-100' },
+            { code: 'ELEC1111', name: 'Electrical Circuit Fundamentals', uni: 'UNSW', rating: 2.9, reviews: 45, tags: ['天书', '慎选'], color: 'bg-purple-100' },
+        ];
+        
+        const unis = ['UNSW', 'USYD', 'Monash', 'UQ', 'Melb'];
+        const subjects = ['COMP', 'FINC', 'MKTG', 'ECON', 'MATH', 'ARTS', 'ENGG'];
+        const tagPool = ['硬核', '水课', '给分好', '作业多', '有趣', '必修', '选修', '慎选'];
+        
+        for(let i=0; i<30; i++) {
+             const subject = subjects[Math.floor(Math.random() * subjects.length)];
+             const code = subject + Math.floor(1000 + Math.random() * 9000);
+             const uni = unis[Math.floor(Math.random() * unis.length)];
+             const rating = (2 + Math.random() * 3).toFixed(1);
+             const reviews = Math.floor(Math.random() * 200);
+             const likes = Math.floor(reviews * (0.5 + Math.random() * 0.5));
+             const favorites = Math.floor(Math.random() * 100) || 1;
+             const isLiked = Math.random() > 0.7;
+             const isFavorited = Math.random() > 0.8;
+             const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+
+             const tags = [];
+             for(let j=0; j<Math.floor(1+Math.random()*3); j++) {
+                 tags.push(tagPool[Math.floor(Math.random() * tagPool.length)]);
+             }
+             if(!courses.find(c => c.code === code)) {
+                courses.push({
+                    code,
+                    name: `Advanced ${subject} Concepts and Applications`,
+                    uni,
+                    rating: parseFloat(rating),
+                    reviews,
+                    likes,
+                    favorites,
+                    isLiked,
+                    isFavorited,
+                    tags: [...new Set(tags)],
+                    color
+                });
+             }
+        }
+
+        const defaultDetail = {
+            desc: '暂无详细介绍。该课程涵盖了该领域的核心概念和实践技能。',
+            units: '6 UOC',
+            prereq: [],
+            status: '未知',
+            lecturer: 'Unknown',
+            tutors: [],
+            statusColor: 'bg-gray-100 text-gray-800',
+            ratings: {
+                workload: { val: 3.0, text: '适中' },
+                grading: { val: 3.0, text: '适中' },
+                fun: { val: 3.0, text: '一般' }
+            },
+            reviews: []
+        };
+
+        const courseDetailsMap = {
+            'COMP9021': {
+                desc: '本课程介绍编程的基本原理。涵盖的主题包括：编程语言、控制结构、函数、数组、指针、字符串、结构体、文件操作、动态内存分配、递归等。适合零基础转码选手。',
+                units: '6 UOC',
+                prereq: ['COMP9031'],
+                status: '开课中',
+                lecturer: 'Eric Martin',
+                tutors: ['Abir', 'Xinyue'],
+                statusColor: 'bg-green-100 text-green-800',
+                isLiked: true,
+                isBookmarked: true,
+                ratings: {
+                    workload: { val: 4.5, text: '繁重' },
+                    grading: { val: 3.0, text: '适中' },
+                    fun: { val: 4.8, text: '有趣' }
+                },
+                reviews: [
+                    { 
+                        id: 'r1',
+                        user: 'Alex', 
+                        term: '2024 T3', 
+                        content: '课程内容非常扎实，Eric老师讲得很好，但是作业量真的很大，建议提前预习。', 
+                        date: '2024-12-10', 
+                        likes: 12,
+                        isLiked: true,
+                        rating: 5.0,
+                        replies: [
+                            { user: 'Eric', content: '感谢你的认可！作业确实有点多，加油！', date: '2024-12-11' }
+                        ]
+                    },
+                    { 
+                        id: 'r2',
+                        user: 'Sarah', 
+                        term: '2024 T1', 
+                        content: '对于没有编程基础的人来说有点难，需要花大量时间练习。', 
+                        date: '2024-05-20', 
+                        likes: 8,
+                        isLiked: false,
+                        rating: 4.0,
+                        replies: []
+                    }
+                ]
+            },
+            'FINC5001': {
+                desc: '金融市场的基本介绍，包括股票、债券、外汇等市场，以及公司金融的基本概念，如时间价值、资本预算、风险与收益等。',
+                units: '6 UOC',
+                prereq: ['COMP9031', 'COMP9021'],
+                status: '开课中',
+                lecturer: 'Peter John',
+                tutors: ['Sarah', 'Mike'],
+                statusColor: 'bg-green-100 text-green-800',
+                isLiked: true,
+                isBookmarked: true,
+                ratings: {
+                    workload: { val: 3.5, text: '适中' },
+                    grading: { val: 2.0, text: '杀手' },
+                    fun: { val: 2.5, text: '一般' }
+                },
+                reviews: [
+                    { 
+                        id: 'r3',
+                        user: 'Tom', 
+                        term: '2024 S2', 
+                        content: '理论性很强，考试很难，挂科率确实不低，大家小心。', 
+                        date: '2024-11-15', 
+                        likes: 25,
+                        isLiked: false,
+                        rating: 3.0,
+                        replies: [
+                            { user: 'Jerry', content: '确实，我也挂了...', date: '2024-11-16' },
+                            { user: 'Tom', content: '太惨了兄弟', date: '2024-11-16' }
+                        ]
+                    },
+                    { 
+                        id: 'r4',
+                        user: 'Jerry', 
+                        term: '2024 S1', 
+                        content: '老师讲得比较枯燥，容易睡着。', 
+                        date: '2024-06-10', 
+                        likes: 5,
+                        isLiked: true,
+                        rating: 2.0,
+                        replies: []
+                    }
+                ]
+            },
+            'MKTG1001': {
+                desc: '市场营销的基础入门课。内容轻松有趣，小组作业比较多，适合作为凑学分的选修课。',
+                units: '6 UOC',
+                prereq: [],
+                status: '开课中',
+                lecturer: 'Jessica Lee',
+                tutors: ['Tom'],
+                statusColor: 'bg-green-100 text-green-800',
+                ratings: {
+                    workload: { val: 2.0, text: '轻松' },
+                    grading: { val: 4.8, text: '水课' },
+                    fun: { val: 4.5, text: '有趣' }
+                },
+                reviews: [
+                    { 
+                        user: 'Alice', 
+                        term: '2024 S2', 
+                        content: '真正的水课，给分超好，推荐！', 
+                        date: '2024-11-20', 
+                        likes: 40,
+                        rating: 5.0,
+                        replies: []
+                    },
+                ]
+            }
+        };
+
+        // ================= Mini Program Logic =================
+        function handleMPLogin() {
+            const loginView = document.getElementById('mp-login-view');
+            const mainView = document.getElementById('mp-main-view');
+            
+            // Slide up animation
+            loginView.style.transform = 'translateY(-100%)';
+            mainView.classList.remove('hidden');
+            
+            // Init data
+            renderMPHotCourses();
+        }
+
+        function switchMPTab(tab) {
+            // Update Tab Bar UI
+            const tabs = ['courses', 'review', 'profile'];
+            tabs.forEach(t => {
+                const icon = document.getElementById(`mp-icon-${t}`);
+                const text = document.getElementById(`mp-text-${t}`);
+                const content = document.getElementById(`mp-tab-${t}`);
+                
+                if (t === tab) {
+                    // Active State
+                    if (icon.classList.contains('ph-bold')) {
+                        icon.classList.replace('ph-bold', 'ph-fill');
+                    }
+                    icon.classList.replace('text-gray-400', 'text-primary');
+                    if (icon.classList.contains('group-hover:text-gray-600')) {
+                        icon.classList.remove('group-hover:text-gray-600');
+                    }
+                    
+                    text.classList.remove('text-gray-400', 'group-hover:text-gray-600');
+                    text.classList.add('text-primary');
+                    
+                    content.classList.remove('hidden');
+                } else {
+                    // Inactive State
+                    if (icon.classList.contains('ph-fill')) {
+                        icon.classList.replace('ph-fill', 'ph-bold');
+                    }
+                    icon.classList.replace('text-primary', 'text-gray-400');
+                    icon.classList.add('group-hover:text-gray-600');
+                    
+                    text.classList.remove('text-primary');
+                    text.classList.add('text-gray-400', 'group-hover:text-gray-600');
+                    
+                    content.classList.add('hidden');
+                }
+            });
+            
+            // Scroll to top
+            document.getElementById('mp-scroll-container').scrollTop = 0;
+        }
+
+        function renderMPHotCourses() {
+            const container = document.getElementById('mp-course-list');
+            const hotCourses = courses.slice(0, 6);
+            
+            container.innerHTML = hotCourses.map(c => `
+                <div class="bg-white p-3 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between active:scale-95 transition cursor-pointer" onclick="openMPCourseDetail('${c.code}')">
+                    <div class="flex items-center overflow-hidden">
+                        <div class="w-10 h-10 rounded-lg ${c.color || 'bg-gray-100'} flex-shrink-0 flex items-center justify-center text-xs font-bold text-gray-700 mr-3">
+                            ${c.code.substring(4)}
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="text-sm font-bold text-gray-900 truncate">${c.code}</h4>
+                            <p class="text-xs text-gray-500 truncate">${c.name}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center text-yellow-500 text-xs font-bold ml-2">
+                        ${c.rating} <i class="ph-fill ph-star ml-0.5"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openMPCourseDetail(code) {
+            const course = courses.find(c => c.code === code);
+            if(!course) return;
+            
+            const detail = courseDetailsMap[code] || defaultDetail;
+
+            // Populate Info
+            document.getElementById('mp-detail-title').textContent = code;
+            document.getElementById('mp-detail-code').textContent = code;
+            document.getElementById('mp-detail-name').textContent = course.name;
+            document.getElementById('mp-detail-rating').textContent = course.rating;
+            document.getElementById('mp-detail-desc').textContent = detail.desc;
+            
+            // Tags
+            const tagsContainer = document.getElementById('mp-detail-tags');
+            tagsContainer.innerHTML = course.tags.map(t => `<span class="px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600">${t}</span>`).join('');
+            
+            // Reviews (Simplified for MP)
+            const reviewsContainer = document.getElementById('mp-detail-reviews');
+            const reviews = detail.reviews || [];
+            
+            if(reviews.length === 0) {
+                reviewsContainer.innerHTML = '<p class="text-xs text-gray-400 text-center py-4">暂无评价</p>';
+            } else {
+                reviewsContainer.innerHTML = reviews.map(r => `
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <div class="flex justify-between items-center mb-1">
+                            <div class="flex items-center">
+                                <div class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-500 mr-2">
+                                    ${r.user.charAt(0)}
+                                </div>
+                                <span class="text-xs font-bold text-gray-900">${r.user}</span>
+                            </div>
+                            <span class="text-[10px] text-gray-400">${r.date}</span>
+                        </div>
+                        <p class="text-xs text-gray-600">${r.content}</p>
+                    </div>
+                `).join('');
+            }
+
+            // Show View
+            document.getElementById('mp-course-detail-view').style.transform = 'translateX(0)';
+        }
+
+        function closeMPCourseDetail() {
+            document.getElementById('mp-course-detail-view').style.transform = 'translateX(100%)';
+        }
+
+        function openMPReviewDrawer() {
+            document.getElementById('mp-drawer-overlay').classList.remove('hidden');
+            // Slight delay to allow display:block to apply before opacity transition
+            setTimeout(() => {
+                document.getElementById('mp-drawer-overlay').classList.remove('opacity-0');
+                document.getElementById('mp-review-drawer').style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function closeMPReviewDrawer() {
+            document.getElementById('mp-review-drawer').style.transform = 'translateY(100%)';
+            document.getElementById('mp-drawer-overlay').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('mp-drawer-overlay').classList.add('hidden');
+            }, 300);
+        }
+
+        function submitMPReview() {
+            alert('小程序演示：评价已发布！');
+            closeMPReviewDrawer();
+        }
+    </script>
+</body>
+</html>
