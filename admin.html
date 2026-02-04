@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRBTree Admin - 管理后台</title>
+    <link rel="icon" href="forum.svg" type="image/svg+xml">
+    <!-- 引入 TailwindCSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 配置 Tailwind 主题色 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // Indigo-600
+                        secondary: '#6366F1', // Indigo-500
+                        surface: '#F9FAFB', // Gray-50
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- 引入图标库 (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* 过渡效果 */
+        .sidebar-transition {
+            transition: width 0.3s ease-in-out;
+        }
+        .content-transition {
+            transition: margin-left 0.3s ease-in-out;
+        }
+        .nav-item-active {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: #4F46E5;
+            border-right: 3px solid #4F46E5;
+        }
+        .nav-item-inactive {
+            color: #6B7280;
+            border-right: 3px solid transparent;
+        }
+        .nav-item-inactive:hover {
+            background-color: #F3F4F6;
+            color: #111827;
+        }
+        
+        /* 隐藏滚动条但保留功能 */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased text-gray-900 h-screen overflow-hidden flex">
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="bg-white border-r border-gray-200 h-full flex flex-col sidebar-transition w-[300px] flex-shrink-0 z-20">
+        <!-- Logo Area -->
+        <div class="h-16 flex items-center px-6 border-b border-gray-100 flex-shrink-0">
+            <div class="flex items-center gap-3 overflow-hidden whitespace-nowrap">
+                <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white flex-shrink-0">
+                    <i class="ph-bold ph-tree-structure text-xl"></i>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-gray-900 sidebar-text">IRBTree Admin</span>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-4 no-scrollbar">
+            <ul class="space-y-1">
+                <!-- 课程管理 -->
+                <li>
+                    <button onclick="switchPage('courses')" id="nav-courses" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-active group">
+                        <i class="ph-bold ph-book-open text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">课程管理</span>
+                    </button>
+                </li>
+                <!-- 评价管理 -->
+                <li>
+                    <button onclick="switchPage('reviews')" id="nav-reviews" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-inactive group">
+                        <i class="ph-bold ph-chat-text text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">评价管理</span>
+                    </button>
+                </li>
+                <!-- 院校管理 -->
+                <li>
+                    <button onclick="switchPage('universities')" id="nav-universities" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-inactive group">
+                        <i class="ph-bold ph-buildings text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">院校管理</span>
+                    </button>
+                </li>
+                <!-- 教师管理 -->
+                <li>
+                    <button onclick="switchPage('teachers')" id="nav-teachers" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-inactive group">
+                        <i class="ph-bold ph-chalkboard-teacher text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">教师管理</span>
+                    </button>
+                </li>
+                <!-- 学期管理 -->
+                <li>
+                    <button onclick="switchPage('semesters')" id="nav-semesters" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-inactive group">
+                        <i class="ph-bold ph-calendar text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">学期管理</span>
+                    </button>
+                </li>
+                <!-- 标签管理 -->
+                <li>
+                    <button onclick="switchPage('tags')" id="nav-tags" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-inactive group">
+                        <i class="ph-bold ph-tag text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">标签管理</span>
+                    </button>
+                </li>
+                <!-- 用户管理 -->
+                <li>
+                    <button onclick="switchPage('users')" id="nav-users" class="w-full flex items-center px-6 py-3 text-sm font-medium transition-colors duration-200 nav-item-inactive group">
+                        <i class="ph-bold ph-users text-xl mr-3 flex-shrink-0"></i>
+                        <span class="sidebar-text whitespace-nowrap">用户管理</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Sidebar Footer (Version & Toggle) -->
+        <div class="border-t border-gray-100 p-4 flex-shrink-0 flex items-center justify-between overflow-hidden">
+            <!-- Left: Info & Refresh -->
+            <div class="flex items-center gap-2 sidebar-text whitespace-nowrap overflow-hidden transition-opacity duration-200">
+                <button onclick="window.location.reload()" class="p-1.5 text-gray-400 hover:text-primary hover:bg-gray-100 rounded-md transition" title="刷新页面">
+                    <i class="ph-bold ph-arrows-clockwise text-lg"></i>
+                </button>
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-gray-500">v1.0.2</span>
+                    <span class="text-[10px] text-gray-400 font-mono">b7a9f2</span>
+                </div>
+            </div>
+            
+            <!-- Right: Toggle Button -->
+            <button onclick="toggleSidebar()" id="sidebar-toggle-btn" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition focus:outline-none">
+                <i class="ph-bold ph-caret-left text-xl" id="sidebar-toggle-icon"></i>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="flex-1 flex flex-col h-full min-w-0 bg-gray-50">
+        <!-- Header -->
+        <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 lg:px-8 flex-shrink-0 shadow-sm z-10">
+            <div class="flex items-center">
+                <!-- Removed Left Toggle Button -->
+                <h1 id="page-title" class="text-xl font-bold text-gray-900">课程管理</h1>
+            </div>
+            
+            <div class="flex items-center space-x-4">
+                <button class="p-2 text-gray-400 hover:text-gray-500 relative">
+                    <i class="ph-bold ph-bell text-xl"></i>
+                    <span class="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+                </button>
+                
+                <div class="h-8 w-px bg-gray-200 mx-2"></div>
+                
+                <!-- Admin User Dropdown -->
+                <div class="relative">
+                    <button onclick="toggleAdminUserDropdown(event)" class="flex items-center gap-2 text-sm focus:outline-none group">
+                        <img src="https://ui-avatars.com/api/?name=Admin+User&background=4F46E5&color=fff" alt="Admin" class="w-8 h-8 rounded-full border border-gray-200">
+                        <span class="font-medium text-gray-700 group-hover:text-gray-900 hidden sm:block">Admin User</span>
+                        <i class="ph-bold ph-caret-down text-gray-400 group-hover:text-gray-600"></i>
+                    </button>
+
+                    <!-- Dropdown Menu -->
+                    <div id="admin-user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-1 border border-gray-100 z-50 transform origin-top-right transition-all animate-fade-in-down">
+                        <a href="index.html" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center transition">
+                            <i class="ph-bold ph-desktop mr-3 text-lg"></i> 切换到用户端
+                        </a>
+                        <div class="border-t border-gray-100 my-1"></div>
+                        <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center transition">
+                            <i class="ph-bold ph-sign-out mr-3 text-lg"></i> 退出登录
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-auto p-4 sm:p-6 lg:p-8">
+            
+            <!-- 课程管理 Content -->
+            <div id="page-courses" class="page-content block space-y-6">
+                <!-- Action Bar -->
+                <div class="flex flex-col sm:flex-row justify-between gap-4">
+                    <div class="flex gap-2">
+                        <div class="relative">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="搜索课程代码或名称..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
+                        </div>
+                        <select class="border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary px-3 py-2">
+                            <option>所有学院</option>
+                            <option>工程学院</option>
+                            <option>商学院</option>
+                        </select>
+                    </div>
+                    <button class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                        <i class="ph-bold ph-plus mr-2"></i> 新增课程
+                    </button>
+                </div>
+
+                <!-- Data Table Placeholder -->
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-medium text-gray-900">课程列表</h3>
+                        <span class="text-xs text-gray-500">共 12,403 条记录</span>
+                    </div>
+                    <div class="p-12 text-center text-gray-500">
+                        <i class="ph-duotone ph-table text-4xl mb-3 text-gray-300"></i>
+                        <p>此处将显示课程数据表格</p>
+                        <p class="text-xs mt-1">包含列：课程代码、课程名称、所属院校、学分、状态、操作</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 评价管理 Content -->
+            <div id="page-reviews" class="page-content hidden space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between gap-4">
+                    <div class="flex gap-2">
+                         <div class="relative">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="搜索评价内容/用户..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
+                        </div>
+                        <select class="border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary px-3 py-2">
+                            <option>所有状态</option>
+                            <option>待审核</option>
+                            <option>已发布</option>
+                            <option>已驳回</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <h3 class="font-medium text-gray-900">最新评价</h3>
+                        <span class="text-xs text-gray-500">需审核: 24</span>
+                    </div>
+                    <div class="p-12 text-center text-gray-500">
+                        <i class="ph-duotone ph-chat-text text-4xl mb-3 text-gray-300"></i>
+                        <p>此处将显示评价审核表格</p>
+                        <p class="text-xs mt-1">包含列：评价内容、课程、用户、评分、提交时间、状态、操作</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 院校管理 Content -->
+            <div id="page-universities" class="page-content hidden space-y-6">
+                <div class="flex justify-end">
+                    <button class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                        <i class="ph-bold ph-plus mr-2"></i> 新增院校
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Card Placeholder -->
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-40 text-gray-400 border-dashed border-2">
+                        <span>院校卡片占位符</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-40 text-gray-400 border-dashed border-2">
+                        <span>院校卡片占位符</span>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-40 text-gray-400 border-dashed border-2">
+                        <span>院校卡片占位符</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 教师管理 Content -->
+            <div id="page-teachers" class="page-content hidden space-y-6">
+                 <div class="flex flex-col sm:flex-row justify-between gap-4">
+                    <div class="flex gap-2">
+                        <div class="relative">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" placeholder="搜索教师姓名..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
+                        </div>
+                    </div>
+                    <button class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                        <i class="ph-bold ph-plus mr-2"></i> 录入教师
+                    </button>
+                </div>
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                    <div class="p-12 text-center text-gray-500">
+                        <i class="ph-duotone ph-chalkboard-teacher text-4xl mb-3 text-gray-300"></i>
+                        <p>此处将显示教师名录表格</p>
+                        <p class="text-xs mt-1">包含列：姓名、所属院校、教授课程、评分、操作</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 学期管理 Content -->
+            <div id="page-semesters" class="page-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-gray-700">学期配置</h2>
+                    <button onclick="openSemesterModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                        <i class="ph-bold ph-plus mr-2"></i> 新增学期
+                    </button>
+                </div>
+                
+                <!-- Semester Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="semester-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- 标签管理 Content -->
+            <div id="page-tags" class="page-content hidden space-y-6">
+                <!-- Top Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <!-- Left: Radio Filter -->
+                    <div class="flex bg-white rounded-lg p-1 border border-gray-200 shadow-sm">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tagFilter" value="all" class="peer sr-only" checked onchange="filterTags('all')">
+                            <span class="block px-4 py-2 rounded-md text-sm font-medium text-gray-500 peer-checked:bg-primary peer-checked:text-white transition">全部</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tagFilter" value="recommended" class="peer sr-only" onchange="filterTags('recommended')">
+                            <span class="block px-4 py-2 rounded-md text-sm font-medium text-gray-500 peer-checked:bg-green-500 peer-checked:text-white transition">推荐</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tagFilter" value="neutral" class="peer sr-only" onchange="filterTags('neutral')">
+                            <span class="block px-4 py-2 rounded-md text-sm font-medium text-gray-500 peer-checked:bg-gray-500 peer-checked:text-white transition">中立</span>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="tagFilter" value="not_recommended" class="peer sr-only" onchange="filterTags('not_recommended')">
+                            <span class="block px-4 py-2 rounded-md text-sm font-medium text-gray-500 peer-checked:bg-red-500 peer-checked:text-white transition">不推荐</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Right: Add Button -->
+                    <button onclick="openTagModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                        <i class="ph-bold ph-plus mr-2"></i> 新增标签
+                    </button>
+                </div>
+
+                <!-- Tag Table -->
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标签内容</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标签类型</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建者</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                                <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="tags-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                    <!-- Empty State (Hidden by default) -->
+                    <div id="tags-empty-state" class="hidden p-12 text-center text-gray-500">
+                        <i class="ph-duotone ph-tag text-4xl mb-3 text-gray-300"></i>
+                        <p>暂无标签数据</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 用户管理 Content -->
+            <div id="page-users" class="page-content hidden space-y-6">
+                <!-- Top Bar: Filter & Actions -->
+                <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
+                    <!-- Left: Filters -->
+                    <div class="flex flex-col sm:flex-row gap-3 w-full xl:w-auto flex-wrap">
+                        <!-- School Filter -->
+                        <select id="user-filter-uni" class="border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary px-3 py-2 min-w-[120px]">
+                            <option value="all">所有院校</option>
+                            <option value="UNSW">UNSW</option>
+                            <option value="USYD">USYD</option>
+                            <option value="Monash">Monash</option>
+                            <option value="UQ">UQ</option>
+                            <option value="Melb">Melbourne</option>
+                        </select>
+                        
+                        <!-- Role Filter -->
+                        <select id="user-filter-role" class="border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary px-3 py-2 min-w-[120px]">
+                            <option value="all">所有角色</option>
+                            <option value="user">普通用户</option>
+                            <option value="vip">VIP</option>
+                            <option value="admin">管理员</option>
+                        </select>
+
+                        <!-- Search Input -->
+                        <div class="relative flex-grow sm:flex-grow-0 sm:w-64">
+                            <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" id="user-filter-search" placeholder="搜索邮箱或用户名..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary">
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex gap-2">
+                            <button onclick="filterUsers()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition">
+                                搜索
+                            </button>
+                            <button onclick="resetUserFilter()" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition" title="重置筛选">
+                                <i class="ph-bold ph-arrow-counter-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Add Button -->
+                    <button onclick="openUserDrawer()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition flex-shrink-0">
+                        <i class="ph-bold ph-plus mr-2"></i> 新增用户
+                    </button>
+                </div>
+
+                <!-- Users Table -->
+                <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden flex flex-col">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">所属院校</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">描述</th>
+                                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">入学日期</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册日期</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="users-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Pagination -->
+                    <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+                        <div class="text-sm text-gray-500">
+                            显示 <span id="user-page-start" class="font-medium">0</span> 到 <span id="user-page-end" class="font-medium">0</span> 条，共 <span id="user-total-count" class="font-medium">0</span> 条
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="changeUserPage(-1)" id="user-prev-btn" class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                上一页
+                            </button>
+                            <span class="text-sm text-gray-700">第 <span id="user-current-page" class="font-medium">1</span> 页</span>
+                            <button onclick="changeUserPage(1)" id="user-next-btn" class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                                下一页
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Add Tag Modal -->
+    <div id="tagModal" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 pointer-events-none transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeTagModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all scale-95 opacity-0 duration-300" id="tagModalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">新增标签</h3>
+                <button onclick="closeTagModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleTagSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">标签类型</label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="newTagType" value="recommended" class="peer sr-only" checked>
+                            <div class="text-center py-2 border rounded-lg text-sm peer-checked:bg-green-50 peer-checked:border-green-500 peer-checked:text-green-700 hover:bg-gray-50 transition">
+                                推荐
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="newTagType" value="neutral" class="peer sr-only">
+                            <div class="text-center py-2 border rounded-lg text-sm peer-checked:bg-gray-100 peer-checked:border-gray-500 peer-checked:text-gray-700 hover:bg-gray-50 transition">
+                                中立
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="newTagType" value="not_recommended" class="peer sr-only">
+                            <div class="text-center py-2 border rounded-lg text-sm peer-checked:bg-red-50 peer-checked:border-red-500 peer-checked:text-red-700 hover:bg-gray-50 transition">
+                                不推荐
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="tagName" class="block text-sm font-medium text-gray-700 mb-2">标签内容</label>
+                    <input type="text" id="tagName" required placeholder="例如：干货满满" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+                
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeTagModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg text-sm font-medium shadow-sm transition">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Semester Modal -->
+    <div id="semesterModal" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 pointer-events-none transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeSemesterModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all scale-95 opacity-0 duration-300" id="semesterModalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">新增学期</h3>
+                <button onclick="closeSemesterModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleSemesterSubmit(event)" class="space-y-4">
+                <div>
+                    <label for="semTitle" class="block text-sm font-medium text-gray-700 mb-1">学期标题 <span class="text-red-500">*</span></label>
+                    <input type="text" id="semTitle" required placeholder="例如：T1" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+
+                <div>
+                    <label for="semDesc" class="block text-sm font-medium text-gray-700 mb-1">描述</label>
+                    <input type="text" id="semDesc" placeholder="例如：第一学期" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">适用院校</label>
+                    <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="semUni" value="UNSW" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">UNSW</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="semUni" value="USYD" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">USYD</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="semUni" value="Monash" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">Monash</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="semUni" value="UQ" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">UQ</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="semUni" value="Melb" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">Melb</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeSemesterModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg text-sm font-medium shadow-sm transition">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Drawer Overlay -->
+    <div id="user-drawer-overlay" onclick="closeUserDrawer()" class="fixed inset-0 bg-black/30 z-[60] hidden transition-opacity duration-300 opacity-0"></div>
+
+    <!-- User Drawer -->
+    <div id="user-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white z-[70] flex flex-col shadow-2xl transform translate-x-full transition-transform duration-300">
+        <!-- Header -->
+        <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white z-10 shrink-0">
+            <h2 class="text-2xl font-bold text-gray-900">新增用户</h2>
+            <button onclick="closeUserDrawer()" class="text-gray-400 hover:text-gray-600 transition">
+                <i class="ph-bold ph-x text-2xl"></i>
+            </button>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-grow overflow-y-auto p-8">
+            <form id="user-form" onsubmit="handleUserSubmit(event)" class="space-y-6">
+                <!-- 必填项区域 -->
+                <div class="space-y-6 pb-6 border-b border-gray-100">
+                    <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wide mb-4">必填信息</h3>
+                    
+                    <div>
+                        <label for="user-email" class="block text-sm font-medium text-gray-700 mb-1">邮箱 <span class="text-red-500">*</span></label>
+                        <input type="email" id="user-email" required class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm" placeholder="student@example.com">
+                    </div>
+
+                    <div>
+                        <label for="user-password" class="block text-sm font-medium text-gray-700 mb-1">初始密码 <span class="text-red-500">*</span></label>
+                        <div class="flex gap-2">
+                            <input type="text" id="user-password" required class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm font-mono bg-gray-50" readonly>
+                            <button type="button" onclick="generatePassword()" class="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-600 transition" title="生成随机密码">
+                                <i class="ph-bold ph-arrows-clockwise"></i>
+                            </button>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">默认生成 8 位随机密码</p>
+                    </div>
+
+                    <div>
+                         <label for="user-name" class="block text-sm font-medium text-gray-700 mb-1">姓名 <span class="text-red-500">*</span></label>
+                         <input type="text" id="user-name" required class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm" placeholder="例如：John Doe">
+                    </div>
+                </div>
+
+                <!-- 选填项区域 -->
+                <div class="space-y-6">
+                    <h3 class="text-sm font-medium text-gray-900 uppercase tracking-wide mb-4">选填信息 (默认 Null)</h3>
+
+                    <div>
+                        <label for="user-uni" class="block text-sm font-medium text-gray-700 mb-1">所属院校</label>
+                        <select id="user-uni" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                            <option value="">未选择 (Null)</option>
+                            <option value="UNSW">UNSW</option>
+                            <option value="USYD">USYD</option>
+                            <option value="Monash">Monash</option>
+                            <option value="UQ">UQ</option>
+                            <option value="Melb">Melbourne</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="user-desc" class="block text-sm font-medium text-gray-700 mb-1">个人简介</label>
+                        <textarea id="user-desc" rows="3" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm resize-none" placeholder="暂无描述"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="user-enroll-date" class="block text-sm font-medium text-gray-700 mb-1">入学日期</label>
+                            <input type="date" id="user-enroll-date" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        </div>
+                        <div>
+                            <label for="user-register-date" class="block text-sm font-medium text-gray-700 mb-1">注册日期</label>
+                            <input type="date" id="user-register-date" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        </div>
+                    </div>
+
+                    <!-- 开关选项 -->
+                    <div class="space-y-4 pt-2">
+                        <div class="flex items-center justify-between">
+                            <span class="flex-grow flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">管理员权限</span>
+                                <span class="text-xs text-gray-500">是否赋予管理员角色</span>
+                            </span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="user-is-admin" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <span class="flex-grow flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">VIP 会员</span>
+                                <span class="text-xs text-gray-500">是否开启 VIP 权益</span>
+                            </span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="user-is-vip" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <span class="flex-grow flex flex-col">
+                                <span class="text-sm font-medium text-gray-900">学生认证</span>
+                                <span class="text-xs text-gray-500">是否通过学生身份认证</span>
+                            </span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="user-is-verified" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="px-8 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-end space-x-4 shrink-0">
+            <button onclick="closeUserDrawer()" class="text-gray-500 hover:text-gray-700 font-medium px-4 py-2 text-sm transition">取消</button>
+            <button onclick="document.getElementById('user-form').dispatchEvent(new Event('submit', {cancelable: true, bubbles: true}))" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-lg text-sm font-medium shadow-sm transition transform hover:scale-105">创建用户</button>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar Toggle Logic
+        let isSidebarOpen = true;
+        const sidebar = document.getElementById('sidebar');
+        const toggleIcon = document.getElementById('sidebar-toggle-icon');
+        
+        function toggleSidebar() {
+            isSidebarOpen = !isSidebarOpen;
+            if (isSidebarOpen) {
+                sidebar.style.width = '320px';
+                toggleIcon.classList.remove('ph-caret-right');
+                toggleIcon.classList.add('ph-caret-left');
+                // Show text
+                document.querySelectorAll('.sidebar-text').forEach(el => {
+                    el.classList.remove('hidden');
+                    el.style.opacity = '1';
+                });
+                
+                // Adjust footer alignment for open state
+                const footer = document.querySelector('#sidebar .border-t');
+                if(footer) footer.classList.replace('justify-center', 'justify-between');
+
+            } else {
+                sidebar.style.width = '80px';
+                toggleIcon.classList.remove('ph-caret-left');
+                toggleIcon.classList.add('ph-caret-right');
+                // Hide text
+                document.querySelectorAll('.sidebar-text').forEach(el => {
+                    el.classList.add('hidden');
+                    el.style.opacity = '0';
+                });
+
+                 // Adjust footer alignment for closed state
+                 const footer = document.querySelector('#sidebar .border-t');
+                 if(footer) footer.classList.replace('justify-between', 'justify-center');
+            }
+        }
+
+        // Dropdown Logic
+        function toggleAdminUserDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('admin-user-dropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function handleLogout() {
+            if(confirm('确定要退出管理后台吗？')) {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('admin-user-dropdown');
+            const btn = document.querySelector('button[onclick="toggleAdminUserDropdown(event)"]');
+            
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            }
+        });
+
+        // Page Switch Logic
+        const pageTitles = {
+            'courses': '课程管理',
+            'reviews': '评价管理',
+            'universities': '院校管理',
+            'teachers': '教师管理',
+            'semesters': '学期管理',
+            'tags': '标签管理',
+            'users': '用户管理'
+        };
+
+        // Tag Management Logic
+        let tags = [
+            { id: 1, name: '干货满满', type: 'recommended', creator: 'Admin', status: 'approved', createdAt: '2024-01-15' },
+            { id: 2, name: '水课', type: 'recommended', creator: 'Alex Student', status: 'pending', createdAt: '2024-01-16' },
+            { id: 3, name: '作业多', type: 'not_recommended', creator: 'Admin', status: 'approved', createdAt: '2024-02-10' },
+            { id: 4, name: '考试难', type: 'not_recommended', creator: 'Tom', status: 'rejected', createdAt: '2024-02-11' },
+            { id: 5, name: '理论性强', type: 'neutral', creator: 'Admin', status: 'approved', createdAt: '2024-03-01' },
+        ];
+        
+        let currentTagFilter = 'all';
+
+        function renderTags() {
+            const tbody = document.getElementById('tags-table-body');
+            const emptyState = document.getElementById('tags-empty-state');
+            if(!tbody) return;
+
+            const filtered = tags.filter(t => currentTagFilter === 'all' || t.type === currentTagFilter);
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = filtered.map(tag => {
+                let typeBadge = '';
+                if (tag.type === 'recommended') typeBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">推荐</span>';
+                else if (tag.type === 'neutral') typeBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">中立</span>';
+                else if (tag.type === 'not_recommended') typeBadge = '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">不推荐</span>';
+                
+                let statusBadge = '';
+                if (tag.status === 'approved') statusBadge = '<span class="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-200"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>已通过</span>';
+                else if (tag.status === 'pending') statusBadge = '<span class="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>审核中</span>';
+                else if (tag.status === 'rejected') statusBadge = '<span class="inline-flex items-center gap-1.5 py-0.5 px-2 rounded-full text-xs font-medium bg-red-50 text-red-700 border border-red-200"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>未通过</span>';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${tag.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${typeBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div class="flex items-center">
+                                <div class="h-6 w-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-600 mr-2 border border-gray-200">
+                                    ${tag.creator.charAt(0)}
+                                </div>
+                                ${tag.creator}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${statusBadge}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${tag.createdAt}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="editTag(${tag.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">编辑</button>
+                            <button onclick="deleteTag(${tag.id})" class="text-red-600 hover:text-red-900">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterTags(type) {
+            currentTagFilter = type;
+            renderTags();
+        }
+
+        function openTagModal() {
+            const modal = document.getElementById('tagModal');
+            const content = document.getElementById('tagModalContent');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; // trigger reflow
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }
+
+        function closeTagModal() {
+            const modal = document.getElementById('tagModal');
+            const content = document.getElementById('tagModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function handleTagSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('tagName').value;
+            const type = document.querySelector('input[name="newTagType"]:checked').value;
+            
+            const newTag = {
+                id: tags.length + 1,
+                name: name,
+                type: type,
+                creator: 'Admin', // 默认管理员
+                status: 'approved', // 默认自动通过
+                createdAt: new Date().toISOString().split('T')[0]
+            };
+            
+            tags.unshift(newTag);
+            renderTags();
+            closeTagModal();
+            document.getElementById('tagName').value = ''; 
+            alert('标签添加成功！');
+        }
+
+        function deleteTag(id) {
+            if(confirm('确定要删除这个标签吗？')) {
+                tags = tags.filter(t => t.id !== id);
+                renderTags();
+            }
+        }
+        
+        function editTag(id) {
+            alert('编辑功能演示：点击了 ID 为 ' + id + ' 的标签');
+        }
+
+        // User Drawer Logic
+        function openUserDrawer() {
+            const drawer = document.getElementById('user-drawer');
+            const overlay = document.getElementById('user-drawer-overlay');
+            
+            overlay.classList.remove('hidden');
+            void overlay.offsetWidth; // trigger reflow
+            overlay.classList.remove('opacity-0');
+            
+            drawer.classList.remove('translate-x-full');
+            
+            // Generate initial password
+            generatePassword();
+        }
+
+        function closeUserDrawer() {
+            const drawer = document.getElementById('user-drawer');
+            const overlay = document.getElementById('user-drawer-overlay');
+            
+            drawer.classList.add('translate-x-full');
+            overlay.classList.add('opacity-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+            
+            // Reset form
+            document.getElementById('user-form').reset();
+        }
+
+        function generatePassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('user-password').value = password;
+        }
+
+        function handleUserSubmit(e) {
+            e.preventDefault();
+            
+            // Get values
+            const email = document.getElementById('user-email').value;
+            const name = document.getElementById('user-name').value;
+            const uni = document.getElementById('user-uni').value || null;
+            const desc = document.getElementById('user-desc').value || null;
+            const enrollDate = document.getElementById('user-enroll-date').value || null;
+            const registerDate = document.getElementById('user-register-date').value || null;
+            const isAdmin = document.getElementById('user-is-admin').checked; // Default false if unchecked
+            const isVip = document.getElementById('user-is-vip').checked;
+            const isVerified = document.getElementById('user-is-verified').checked;
+
+            const newUser = {
+                id: mockUsers.length + 1,
+                email: email,
+                name: name,
+                uni: uni,
+                avatar: null,
+                desc: desc,
+                isVerified: isVerified,
+                role: isAdmin ? 'admin' : (isVip ? 'vip' : 'user'),
+                registerDate: registerDate || new Date().toISOString().split('T')[0],
+                enrollDate: enrollDate || '2024-02-15' // Default fallback
+            };
+
+            mockUsers.unshift(newUser);
+            
+            // Reset filters to show new user
+            userState.filters.search = '';
+            userState.filters.role = 'all';
+            userState.filters.uni = 'all';
+            userState.page = 1;
+            
+            renderUsers();
+            closeUserDrawer();
+            alert('用户创建成功！初始密码: ' + document.getElementById('user-password').value);
+        }
+
+        // User Management Logic
+        let mockUsers = [];
+        let userState = {
+            page: 1,
+            pageSize: 10,
+            filters: { uni: 'all', role: 'all', search: '' }
+        };
+
+        function generateMockUsers() {
+            const firstNames = ['James', 'Mary', 'John', 'Patricia', 'Robert', 'Jennifer', 'Michael', 'Linda', 'William', 'Elizabeth'];
+            const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez'];
+            const unis = ['UNSW', 'USYD', 'Monash', 'UQ', 'Melb'];
+            
+            for (let i = 1; i <= 20; i++) {
+                const fname = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lname = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const uni = unis[Math.floor(Math.random() * unis.length)];
+                const isVip = Math.random() > 0.6;
+                const isAdmin = Math.random() > 0.75;
+                const isVerified = Math.random() > 0.3;
+                
+                mockUsers.push({
+                    id: i,
+                    email: `${fname.toLowerCase()}.${lname.toLowerCase()}${i}@student.edu.au`,
+                    name: `${fname} ${lname}`,
+                    uni: uni,
+                    avatar: null, // Placeholder
+                    desc: '专注 CS 课程评价，希望能帮到更多的学弟学妹。',
+                    isVerified: isVerified,
+                    role: isAdmin ? 'admin' : (isVip ? 'vip' : 'user'),
+                    registerDate: `2024-${Math.floor(1+Math.random()*11)}-${Math.floor(1+Math.random()*28)}`,
+                    enrollDate: `202${Math.floor(Math.random()*4)}-02-15`
+                });
+            }
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('users-table-body');
+            if(!tbody) return;
+
+            // Filter
+            let filtered = mockUsers.filter(u => {
+                const matchUni = userState.filters.uni === 'all' || u.uni === userState.filters.uni;
+                const matchRole = userState.filters.role === 'all' || u.role === userState.filters.role;
+                const searchLower = userState.filters.search.toLowerCase();
+                const matchSearch = !searchLower || u.email.toLowerCase().includes(searchLower) || u.name.toLowerCase().includes(searchLower);
+                return matchUni && matchRole && matchSearch;
+            });
+
+            // Pagination
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / userState.pageSize);
+            
+            // Adjust page if out of bounds
+            if (userState.page > totalPages && totalPages > 0) userState.page = totalPages;
+            if (userState.page < 1) userState.page = 1;
+
+            const start = (userState.page - 1) * userState.pageSize;
+            const end = Math.min(start + userState.pageSize, total);
+            const pageData = filtered.slice(start, end);
+
+            // Render Table
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-12 text-center text-gray-500">未找到匹配用户</td></tr>`;
+            } else {
+                tbody.innerHTML = pageData.map(user => {
+                    // Avatar
+                    const avatarHtml = user.avatar 
+                        ? `<img src="${user.avatar}" class="h-10 w-10 rounded-full">`
+                        : `<div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold text-sm">${user.name.charAt(0)}</div>`;
+                    
+                    // Role Badge
+                    let roleBadge = '';
+                    if (user.role === 'admin') roleBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">管理员</span>';
+                    else if (user.role === 'vip') roleBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"><i class="ph-fill ph-crown mr-1"></i>VIP</span>';
+                    else roleBadge = '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">普通用户</span>';
+
+                    // Verified Icon
+                    const verifiedIcon = user.isVerified 
+                        ? '<i class="ph-fill ph-seal-check text-blue-500 ml-1 text-lg" title="已认证"></i>' 
+                        : '<i class="ph ph-seal-check text-gray-300 ml-1 text-lg" title="未认证"></i>';
+
+                    return `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        ${avatarHtml}
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900 flex items-center">
+                                            ${user.name}
+                                            ${verifiedIcon}
+                                        </div>
+                                        <div class="text-sm text-gray-500">${user.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900">${user.uni}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="text-sm text-gray-500 max-w-xs truncate" title="${user.desc}">${user.desc}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                ${roleBadge}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${user.enrollDate}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                ${user.registerDate}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <button onclick="alert('编辑用户 ID: ${user.id}')" class="text-indigo-600 hover:text-indigo-900 mr-3">编辑</button>
+                                <button onclick="alert('删除用户 ID: ${user.id}')" class="text-red-600 hover:text-red-900">删除</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update Pagination UI
+            document.getElementById('user-page-start').textContent = total === 0 ? 0 : start + 1;
+            document.getElementById('user-page-end').textContent = end;
+            document.getElementById('user-total-count').textContent = total;
+            document.getElementById('user-current-page').textContent = userState.page;
+            
+            document.getElementById('user-prev-btn').disabled = userState.page <= 1;
+            document.getElementById('user-next-btn').disabled = userState.page >= totalPages;
+        }
+
+        function filterUsers() {
+            userState.filters.uni = document.getElementById('user-filter-uni').value;
+            userState.filters.role = document.getElementById('user-filter-role').value;
+            userState.filters.search = document.getElementById('user-filter-search').value;
+            userState.page = 1; // Reset to first page
+            renderUsers();
+        }
+
+        function resetUserFilter() {
+            document.getElementById('user-filter-uni').value = 'all';
+            document.getElementById('user-filter-role').value = 'all';
+            document.getElementById('user-filter-search').value = '';
+            filterUsers();
+        }
+
+        function changeUserPage(delta) {
+            userState.page += delta;
+            renderUsers();
+        }
+
+        // Semester Management Logic
+        let semesters = [
+            { id: 1, title: 'T1', desc: '第一学期', unis: ['UNSW'] },
+            { id: 2, title: 'T2', desc: '第二学期 (含小学期)', unis: ['UNSW'] },
+            { id: 3, title: 'S1', desc: '春季学期', unis: ['USYD', 'Monash', 'UQ', 'Melb'] },
+            { id: 4, title: 'S2', desc: '秋季学期', unis: ['USYD', 'Monash', 'UQ', 'Melb'] },
+            { id: 5, title: 'Summer', desc: '暑期课程', unis: ['UNSW', 'USYD'] }
+        ];
+
+        function renderSemesters() {
+            const grid = document.getElementById('semester-grid');
+            if(!grid) return;
+            
+            grid.innerHTML = semesters.map(sem => `
+                <div class="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition group relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-bl-full -mr-12 -mt-12 transition group-hover:bg-primary/10"></div>
+                    
+                    <div class="flex justify-between items-start mb-4 relative z-10">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">${sem.title}</h3>
+                            <p class="text-sm text-gray-500 mt-1">${sem.desc}</p>
+                        </div>
+                        <div class="p-2 bg-gray-50 rounded-lg text-primary">
+                            <i class="ph-bold ph-calendar-check text-xl"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-2">代表院校</span>
+                        <div class="flex flex-wrap gap-2">
+                            ${sem.unis.map(uni => `
+                                <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                    ${uni}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex space-x-2">
+                        <button onclick="alert('编辑学期: ${sem.title}')" class="p-1.5 text-gray-400 hover:text-primary bg-white rounded-full shadow-sm border border-gray-100">
+                            <i class="ph-bold ph-pencil-simple"></i>
+                        </button>
+                        <button onclick="deleteSemester(${sem.id})" class="p-1.5 text-gray-400 hover:text-red-500 bg-white rounded-full shadow-sm border border-gray-100">
+                            <i class="ph-bold ph-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openSemesterModal() {
+            const modal = document.getElementById('semesterModal');
+            const content = document.getElementById('semesterModalContent');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }
+
+        function closeSemesterModal() {
+            const modal = document.getElementById('semesterModal');
+            const content = document.getElementById('semesterModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            
+            // Reset form
+            document.getElementById('semTitle').value = '';
+            document.getElementById('semDesc').value = '';
+            document.querySelectorAll('input[name="semUni"]').forEach(cb => cb.checked = false);
+        }
+
+        function handleSemesterSubmit(e) {
+            e.preventDefault();
+            const title = document.getElementById('semTitle').value;
+            const desc = document.getElementById('semDesc').value;
+            
+            const selectedUnis = [];
+            document.querySelectorAll('input[name="semUni"]:checked').forEach(cb => {
+                selectedUnis.push(cb.value);
+            });
+            
+            const newSem = {
+                id: semesters.length + 1,
+                title: title,
+                desc: desc,
+                unis: selectedUnis.length > 0 ? selectedUnis : ['General']
+            };
+            
+            semesters.push(newSem);
+            renderSemesters();
+            closeSemesterModal();
+            alert('学期添加成功！');
+        }
+
+        function deleteSemester(id) {
+            if(confirm('确定要删除该学期吗？')) {
+                semesters = semesters.filter(s => s.id !== id);
+                renderSemesters();
+            }
+        }
+
+        function switchPage(pageId) {
+            if (pageId === 'tags') renderTags();
+            if (pageId === 'semesters') renderSemesters();
+            if (pageId === 'users') {
+                if(mockUsers.length === 0) generateMockUsers();
+                renderUsers();
+            }
+            // 1. Hide all pages
+            document.querySelectorAll('.page-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            // 2. Show selected page
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+                targetPage.classList.add('block');
+            }
+
+            // 3. Update Title
+            const title = pageTitles[pageId] || '管理后台';
+            document.getElementById('page-title').textContent = title;
+
+            // 4. Update Nav State
+            document.querySelectorAll('nav button').forEach(btn => {
+                // Reset all
+                btn.classList.remove('nav-item-active');
+                btn.classList.add('nav-item-inactive');
+                
+                // Activate current
+                if (btn.id === 'nav-' + pageId) {
+                    btn.classList.remove('nav-item-inactive');
+                    btn.classList.add('nav-item-active');
+                }
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check screen size for initial sidebar state (optional)
+            if (window.innerWidth < 1024) {
+                toggleSidebar(); // Start collapsed on smaller screens
+            }
+        });
+    </script>
+</body>
+</html>

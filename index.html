@@ -920,6 +920,12 @@
 
     <!-- ================= JavaScript Logic ================= -->
     <script>
+        // 0. 预定义用户数据 (Demo)
+        const USERS = {
+            STUDENT: { name: 'Alex Student', role: 'student', email: 'student@uni.edu.au' },
+            ADMIN: { name: 'Admin User', role: 'admin', email: 'admin@irbtree.com' }
+        };
+
         // 1. 模拟数据
         const colorPalette = ['bg-red-100', 'bg-orange-100', 'bg-amber-100', 'bg-green-100', 'bg-teal-100', 'bg-blue-100', 'bg-indigo-100', 'bg-purple-100', 'bg-pink-100'];
         
@@ -1160,10 +1166,34 @@
             return sessionStorage.getItem('irbtree_user') !== null;
         }
 
+        function toggleUserRole() {
+            const currentUser = JSON.parse(sessionStorage.getItem('irbtree_user'));
+            if (!currentUser) return;
+
+            const newUser = currentUser.role === 'student' ? USERS.ADMIN : USERS.STUDENT;
+            sessionStorage.setItem('irbtree_user', JSON.stringify(newUser));
+            
+            // Re-render auth section
+            renderAuthStatus();
+            
+            // If on profile page, refresh it
+            if (!document.getElementById('view-profile').classList.contains('hidden')) {
+                renderProfile();
+            }
+        }
+
         function renderAuthStatus() {
             const authSection = document.getElementById('authSection');
             if (isLogged()) {
                 const user = JSON.parse(sessionStorage.getItem('irbtree_user'));
+                // Default to student if role missing (backward compatibility)
+                if (!user.role) user.role = 'student'; 
+
+                const isAdmin = user.role === 'admin';
+                const badgeClass = isAdmin ? 'bg-red-100 text-red-800' : 'bg-blue-50 text-blue-700';
+                const badgeText = isAdmin ? '管理员' : '学生认证';
+                const badgeIcon = isAdmin ? 'ph-shield-check text-red-500' : 'ph-student text-blue-500';
+
                 authSection.innerHTML = `
                     <div class="flex items-center space-x-4">
                         <!-- Notification Icon -->
@@ -1173,21 +1203,36 @@
                         </button>
 
                         <div class="text-right hidden sm:block">
-                            <p class="text-sm font-medium text-gray-900">${user.name}</p>
-                            <p class="text-xs text-gray-500">学生认证</p>
+                            <div class="flex items-center justify-end space-x-2">
+                                 <p class="text-sm font-medium text-gray-900">${user.name}</p>
+                            </div>
+                            <div class="flex items-center justify-end mt-0.5 cursor-pointer group" onclick="toggleUserRole()" title="点击切换身份 (Demo)">
+                                <i class="ph-bold ph-arrows-left-right text-xs text-gray-400 group-hover:text-primary mr-1 transition"></i>
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badgeClass} border border-transparent group-hover:border-gray-200 transition">
+                                    <i class="ph-fill ${badgeIcon} mr-1"></i> ${badgeText}
+                                </span>
+                            </div>
                         </div>
                         
                         <!-- Avatar Dropdown -->
                         <div class="relative">
-                            <button onclick="toggleUserDropdown(event)" class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold border border-indigo-200 hover:ring-2 hover:ring-offset-2 hover:ring-primary transition" id="user-menu-button">
+                            <button onclick="toggleUserDropdown(event)" class="h-10 w-10 rounded-full ${isAdmin ? 'bg-red-100 text-red-600' : 'bg-indigo-100 text-primary'} flex items-center justify-center font-bold border ${isAdmin ? 'border-red-200' : 'border-indigo-200'} hover:ring-2 hover:ring-offset-2 ${isAdmin ? 'hover:ring-red-500' : 'hover:ring-primary'} transition" id="user-menu-button">
                                 ${user.name.charAt(0)}
                             </button>
                             
                             <!-- Dropdown Menu -->
-                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg py-2 border border-gray-100 z-50 transform origin-top-right transition-all animate-fade-in-down">
+                            <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg py-2 border border-gray-100 z-50 transform origin-top-right transition-all animate-fade-in-down">
+                                ${isAdmin ? `
+                                <a href="admin.html" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center transition">
+                                    <i class="ph-bold ph-gear mr-3 text-lg"></i> 切换到管理端
+                                </a>
+                                ` : ''}
                                 <a href="#" onclick="switchTab(event, 'profile'); toggleUserDropdown(event);" class="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center transition">
                                     <i class="ph-bold ph-user mr-3 text-lg"></i> 个人中心
                                 </a>
+                                 <button onclick="toggleUserRole()" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary flex items-center transition sm:hidden">
+                                    <i class="ph-bold ph-arrows-left-right mr-3 text-lg"></i> 切换身份 (${isAdmin ? 'To Student' : 'To Admin'})
+                                </button>
                                 <div class="border-t border-gray-100 my-1"></div>
                                 <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center transition">
                                     <i class="ph-bold ph-sign-out mr-3 text-lg"></i> 退出登录
@@ -2211,13 +2256,17 @@
         function handleLogin(e) {
             e.preventDefault();
             const email = document.getElementById('email').value;
-            // 模拟登录成功
-            const mockUser = {
-                name: 'Alex Student',
-                email: email,
-                token: 'mock-jwt-token-123'
-            };
-            sessionStorage.setItem('irbtree_user', JSON.stringify(mockUser));
+            
+            // 使用 Demo 预设用户，默认登录为学生
+            let targetUser = USERS.STUDENT;
+            
+            // 如果输入包含 admin 关键词，则登录为管理员 (可选彩蛋，不影响默认逻辑)
+            if (email.includes('admin')) {
+                targetUser = USERS.ADMIN;
+            }
+            
+            // 存储用户会话
+            sessionStorage.setItem('irbtree_user', JSON.stringify(targetUser));
             
             // UI 反馈
             const btn = e.target.querySelector('button');
