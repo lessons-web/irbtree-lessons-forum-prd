@@ -226,13 +226,13 @@
                     <div class="flex gap-2">
                          <div class="relative">
                             <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" placeholder="搜索评价内容/用户..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
+                            <input type="text" id="review-search" oninput="renderReviews()" placeholder="搜索评价内容/用户..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
                         </div>
-                        <select class="border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary px-3 py-2">
-                            <option>所有状态</option>
-                            <option>待审核</option>
-                            <option>已发布</option>
-                            <option>已驳回</option>
+                        <select id="review-status-filter" onchange="renderReviews()" class="border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary px-3 py-2">
+                            <option value="all">所有状态</option>
+                            <option value="pending">待审核</option>
+                            <option value="published">已发布</option>
+                            <option value="rejected">已驳回</option>
                         </select>
                     </div>
                 </div>
@@ -240,34 +240,64 @@
                 <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
                     <div class="px-6 py-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
                         <h3 class="font-medium text-gray-900">最新评价</h3>
-                        <span class="text-xs text-gray-500">需审核: 24</span>
+                        <span class="text-xs text-gray-500">需审核: <span id="review-pending-count">0</span></span>
                     </div>
-                    <div class="p-12 text-center text-gray-500">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/3">评价内容</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">课程</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评分</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">提交时间</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="reviews-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="reviews-empty-state" class="hidden p-12 text-center text-gray-500">
                         <i class="ph-duotone ph-chat-text text-4xl mb-3 text-gray-300"></i>
-                        <p>此处将显示评价审核表格</p>
-                        <p class="text-xs mt-1">包含列：评价内容、课程、用户、评分、提交时间、状态、操作</p>
+                        <p>未找到匹配的评价数据</p>
                     </div>
+
+                    <!-- Pagination -->
+                    <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50" id="reviews-pagination">
+                         <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- PRD Logic Card -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <i class="ph-fill ph-info text-8xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-indigo-900 mb-3 flex items-center">
+                        <i class="ph-bold ph-lightbulb mr-2"></i> 评价审核逻辑 (PRD)
+                    </h3>
+                    <ul class="space-y-2 text-sm text-indigo-800 list-disc list-inside">
+                        <li><strong>审核流程：</strong> 所有新提交的评价默认状态为“待审核”，管理员审核通过后对用户可见。</li>
+                        <li><strong>驳回反馈：</strong> 审核不通过时，必须填写驳回原因。后续将扩展用户消息中心，通知用户评价被驳回的具体原因。</li>
+                        <li><strong>用户信誉：</strong> 连续多次发布违规评价的用户将被标记，系统可能会限制其发布权限（待开发）。</li>
+                    </ul>
                 </div>
             </div>
 
             <!-- 院校管理 Content -->
             <div id="page-universities" class="page-content hidden space-y-6">
                 <div class="flex justify-end">
-                    <button class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                    <button onclick="openUniversityModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
                         <i class="ph-bold ph-plus mr-2"></i> 新增院校
                     </button>
                 </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Card Placeholder -->
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-40 text-gray-400 border-dashed border-2">
-                        <span>院校卡片占位符</span>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-40 text-gray-400 border-dashed border-2">
-                        <span>院校卡片占位符</span>
-                    </div>
-                    <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center justify-center h-40 text-gray-400 border-dashed border-2">
-                        <span>院校卡片占位符</span>
-                    </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="university-grid">
+                    <!-- Populated by JS -->
                 </div>
             </div>
 
@@ -277,19 +307,63 @@
                     <div class="flex gap-2">
                         <div class="relative">
                             <i class="ph ph-magnifying-glass absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                            <input type="text" placeholder="搜索教师姓名..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
+                            <input type="text" id="teacher-search" oninput="renderTeachers()" placeholder="搜索教师姓名..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-primary focus:border-primary w-64">
                         </div>
                     </div>
-                    <button class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
+                    <button onclick="openTeacherModal()" class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center shadow-sm transition">
                         <i class="ph-bold ph-plus mr-2"></i> 录入教师
                     </button>
                 </div>
+                
+                <!-- Teacher Table -->
                 <div class="bg-white shadow-sm rounded-xl border border-gray-200 overflow-hidden">
-                    <div class="p-12 text-center text-gray-500">
-                        <i class="ph-duotone ph-chalkboard-teacher text-4xl mb-3 text-gray-300"></i>
-                        <p>此处将显示教师名录表格</p>
-                        <p class="text-xs mt-1">包含列：姓名、所属院校、教授课程、评分、操作</p>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">姓名</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">所属学校</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">教授课程</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">评分</th>
+                                    <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200" id="teachers-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
                     </div>
+                    <!-- Empty State -->
+                    <div id="teachers-empty-state" class="hidden p-12 text-center text-gray-500">
+                        <i class="ph-duotone ph-chalkboard-teacher text-4xl mb-3 text-gray-300"></i>
+                        <p>未找到匹配的教师数据</p>
+                    </div>
+                    <!-- Pagination (Simple) -->
+                    <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+                        <div class="text-sm text-gray-500">共 <span id="teacher-total-count">0</span> 位教师</div>
+                         <div class="flex space-x-2">
+                            <button disabled class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm text-gray-400 cursor-not-allowed">上一页</button>
+                            <button disabled class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm text-gray-400 cursor-not-allowed">下一页</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRD Logic Card -->
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-6 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <i class="ph-fill ph-info text-8xl text-blue-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-blue-900 mb-3 flex items-center">
+                        <i class="ph-bold ph-lightbulb mr-2"></i> 教师数据逻辑 (PRD)
+                    </h3>
+                    <ul class="space-y-2 text-sm text-blue-800 list-disc list-inside">
+                        <li><strong>多对多关系：</strong> 教师和学校是多对多关系，教师和课程也是多对多关系，助教同理。</li>
+                        <li><strong>数据来源：</strong> 教授的课程应该从课程列表里“课程讲师”字段获取；助教则从“助教”字段获取。</li>
+                        <li><strong>新增逻辑：</strong> 新增教师时，课程列表可以为空，因为通常是新建课程关联后才知道教师教授的课程是什么。</li>
+                        <li><strong>未来规划：</strong> 后续可能会有教师评分系统，目前数据字段已预留 (Rating)，前端暂不实现具体评分逻辑。</li>
+                    </ul>
                 </div>
             </div>
 
@@ -498,6 +572,256 @@
                 
                 <div class="pt-4 flex justify-end space-x-3">
                     <button type="button" onclick="closeTagModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">取消</button>
+                    <button type="submit" class="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg text-sm font-medium shadow-sm transition">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add University Drawer -->
+    <div id="universityModal" class="fixed inset-0 z-50 flex justify-end hidden opacity-0 pointer-events-none transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeUniversityModal()"></div>
+        
+        <!-- Drawer Content -->
+        <div class="bg-white shadow-2xl w-full max-w-lg h-full relative z-10 transform transition-transform duration-300 translate-x-full flex flex-col" id="universityModalContent">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900">新增院校</h3>
+                <button onclick="closeUniversityModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <form onsubmit="handleUniversitySubmit(event)" class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="uniNameCN" class="block text-sm font-medium text-gray-700 mb-1">中文名称 <span class="text-red-500">*</span></label>
+                            <input type="text" id="uniNameCN" required placeholder="例如：新南威尔士大学" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        </div>
+                        <div>
+                            <label for="uniCode" class="block text-sm font-medium text-gray-700 mb-1">院校代码 <span class="text-red-500">*</span></label>
+                            <input type="text" id="uniCode" required placeholder="例如：UNSW" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="uniNameEN" class="block text-sm font-medium text-gray-700 mb-1">英文名称 <span class="text-red-500">*</span></label>
+                        <input type="text" id="uniNameEN" required placeholder="例如：University of New South Wales" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                    </div>
+
+                    <div>
+                        <label for="uniImage" class="block text-sm font-medium text-gray-700 mb-1">封面图片 URL <span class="text-red-500">*</span></label>
+                        <input type="url" id="uniImage" required placeholder="https://example.com/image.jpg" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">所属国家 <span class="text-red-500">*</span></label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <label class="cursor-pointer border border-gray-200 rounded-lg p-3 hover:bg-gray-50 flex items-center space-x-3 has-[:checked]:border-primary has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="uniCountry" value="Australia" checked class="peer sr-only" data-flag="🇦🇺" data-name="澳大利亚">
+                                <span class="text-2xl">🇦🇺</span>
+                                <span class="text-sm font-medium text-gray-700">澳大利亚</span>
+                            </label>
+                            <label class="cursor-pointer border border-gray-200 rounded-lg p-3 hover:bg-gray-50 flex items-center space-x-3 has-[:checked]:border-primary has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="uniCountry" value="UK" class="peer sr-only" data-flag="🇬🇧" data-name="英国">
+                                <span class="text-2xl">🇬🇧</span>
+                                <span class="text-sm font-medium text-gray-700">英国</span>
+                            </label>
+                            <label class="cursor-pointer border border-gray-200 rounded-lg p-3 hover:bg-gray-50 flex items-center space-x-3 has-[:checked]:border-primary has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="uniCountry" value="USA" class="peer sr-only" data-flag="🇺🇸" data-name="美国">
+                                <span class="text-2xl">🇺🇸</span>
+                                <span class="text-sm font-medium text-gray-700">美国</span>
+                            </label>
+                            <label class="cursor-pointer border border-gray-200 rounded-lg p-3 hover:bg-gray-50 flex items-center space-x-3 has-[:checked]:border-primary has-[:checked]:bg-blue-50 transition">
+                                <input type="radio" name="uniCountry" value="Canada" class="peer sr-only" data-flag="🇨🇦" data-name="加拿大">
+                                <span class="text-2xl">🇨🇦</span>
+                                <span class="text-sm font-medium text-gray-700">加拿大</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="uniDesc" class="block text-sm font-medium text-gray-700 mb-1">院校简介</label>
+                        <textarea id="uniDesc" rows="4" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm resize-none" placeholder="简要描述院校特色..."></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">学期设置 (可多选)</label>
+                        <div class="flex flex-wrap gap-2">
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="T1" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">T1</span>
+                            </label>
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="T2" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">T2</span>
+                            </label>
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="T3" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">T3</span>
+                            </label>
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="S1" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">S1</span>
+                            </label>
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="S2" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">S2</span>
+                            </label>
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="Summer" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">Summer</span>
+                            </label>
+                            <label class="cursor-pointer select-none">
+                                <input type="checkbox" name="uniTerm" value="Winter" class="peer sr-only">
+                                <span class="px-3 py-1 border rounded-full text-xs peer-checked:bg-indigo-500 peer-checked:text-white peer-checked:border-indigo-500 text-gray-600 bg-white hover:border-indigo-300 transition">Winter</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-6 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
+                <button type="button" onclick="closeUniversityModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition">取消</button>
+                <button type="button" onclick="document.querySelector('#universityModalContent form').dispatchEvent(new Event('submit'))" class="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg text-sm font-medium shadow-sm transition">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Detail Drawer -->
+    <div id="reviewDetailDrawer" class="fixed inset-0 z-50 flex justify-end hidden opacity-0 pointer-events-none transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeReviewDetailDrawer()"></div>
+        
+        <!-- Drawer Content -->
+        <div class="bg-white shadow-2xl w-full max-w-lg h-full relative z-10 transform transition-transform duration-300 translate-x-full flex flex-col" id="reviewDetailContent">
+            <!-- Header -->
+            <div class="flex justify-between items-center p-6 border-b border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900">评价详情</h3>
+                <button onclick="closeReviewDetailDrawer()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-6">
+                <!-- User Info -->
+                <div class="flex items-center space-x-3">
+                    <div id="review-detail-avatar" class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold"></div>
+                    <div>
+                        <div id="review-detail-user" class="font-bold text-gray-900"></div>
+                        <div id="review-detail-date" class="text-xs text-gray-500"></div>
+                    </div>
+                    <div id="review-detail-status" class="ml-auto"></div>
+                </div>
+
+                <!-- Course Info -->
+                <div class="bg-gray-50 p-4 rounded-lg flex items-center justify-between">
+                    <div>
+                        <span class="text-xs text-gray-500 block mb-1">评价课程</span>
+                        <div id="review-detail-course" class="font-bold text-gray-800"></div>
+                    </div>
+                    <div id="review-detail-score" class="text-2xl font-bold text-yellow-500 flex items-center">
+                        <!-- Score -->
+                    </div>
+                </div>
+
+                <!-- Review Content -->
+                <div>
+                    <h4 class="text-sm font-medium text-gray-700 mb-2">评价内容</h4>
+                    <div id="review-detail-content" class="text-gray-600 text-sm leading-relaxed bg-white border border-gray-100 p-4 rounded-lg shadow-sm min-h-[100px]"></div>
+                </div>
+
+                <!-- Reject Reason (Visible if rejected) -->
+                <div id="review-detail-reject-reason-container" class="hidden">
+                    <h4 class="text-sm font-medium text-red-600 mb-2">驳回原因</h4>
+                    <div id="review-detail-reject-reason" class="text-red-500 text-sm bg-red-50 p-3 rounded-lg border border-red-100"></div>
+                </div>
+
+                <!-- Moderation Input (Visible if pending) -->
+                <div id="review-moderation-input" class="hidden border-t border-gray-100 pt-6">
+                     <h4 class="text-sm font-medium text-gray-900 mb-3">审核操作</h4>
+                     <textarea id="review-reject-input" rows="3" class="w-full border border-gray-300 rounded-lg p-3 text-sm focus:ring-primary focus:border-primary mb-3" placeholder="如果驳回，请在此输入原因..."></textarea>
+                     <div class="flex gap-3">
+                         <button onclick="approveReview()" class="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg text-sm font-medium transition">通过审核</button>
+                         <button onclick="rejectReview()" class="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm font-medium transition">驳回评价</button>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Teacher Modal -->
+    <div id="teacherModal" class="fixed inset-0 z-50 flex items-center justify-center hidden opacity-0 pointer-events-none transition-opacity duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeTeacherModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative z-10 transform transition-all scale-95 opacity-0 duration-300" id="teacherModalContent">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold text-gray-900">新增教师</h3>
+                <button onclick="closeTeacherModal()" class="text-gray-400 hover:text-gray-600 transition">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+            
+            <form onsubmit="handleTeacherSubmit(event)" class="space-y-4">
+                <div>
+                    <label for="teacherName" class="block text-sm font-medium text-gray-700 mb-1">姓名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="teacherName" required placeholder="例如：David Wilson" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+
+                <div>
+                    <label for="teacherEmail" class="block text-sm font-medium text-gray-700 mb-1">邮箱 <span class="text-red-500">*</span></label>
+                    <input type="email" id="teacherEmail" required placeholder="例如：david.wilson@unsw.edu.au" class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">教师类型 <span class="text-red-500">*</span></label>
+                    <div class="flex space-x-4">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="teacherType" value="Lecturer" checked class="text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">讲师 (Lecturer)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="teacherType" value="Tutor" class="text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">助教 (Tutor)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">所属院校 (可多选) <span class="text-red-500">*</span></label>
+                    <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 border border-gray-200 rounded-lg bg-gray-50">
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="teacherUni" value="UNSW" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">UNSW</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="teacherUni" value="USYD" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">USYD</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="teacherUni" value="Monash" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">Monash</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="teacherUni" value="UQ" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">UQ</span>
+                        </label>
+                        <label class="flex items-center space-x-2 p-1 hover:bg-white rounded cursor-pointer">
+                            <input type="checkbox" name="teacherUni" value="Melb" class="rounded text-primary focus:ring-primary border-gray-300">
+                            <span class="text-sm text-gray-700">Melb</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="pt-4 flex justify-end space-x-3">
+                    <button type="button" onclick="closeTeacherModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition">取消</button>
                     <button type="submit" class="px-4 py-2 bg-primary hover:bg-secondary text-white rounded-lg text-sm font-medium shadow-sm transition">保存</button>
                 </div>
             </form>
@@ -1209,7 +1533,10 @@
 
         function switchPage(pageId) {
             if (pageId === 'tags') renderTags();
+            if (pageId === 'universities') renderUniversities();
             if (pageId === 'semesters') renderSemesters();
+            if (pageId === 'teachers') renderTeachers();
+            if (pageId === 'reviews') renderReviews();
             if (pageId === 'users') {
                 if(mockUsers.length === 0) generateMockUsers();
                 renderUsers();
@@ -1243,6 +1570,664 @@
                     btn.classList.add('nav-item-active');
                 }
             });
+        }
+
+
+        // Review Management Logic
+        let mockReviews = [];
+        let reviewState = {
+            page: 1,
+            pageSize: 10,
+            currentReviewId: null
+        };
+
+        function generateMockReviews() {
+            const contents = [
+                "这门课非常实用，老师讲得很清楚，作业量适中。",
+                "内容有点难，需要花很多时间预习，但是收获很大。",
+                "考试太难了，挂科率很高，大家慎选！",
+                "老师很负责，每周都有答疑时间，对项目帮助很大。",
+                "课程设计不合理，前后内容衔接不上。",
+                "非常推荐！特别是对于想从事Web开发的同学。",
+                "助教人很好，不仅解答问题还分享了很多学习资源。",
+                "这学期的Project有点赶，建议提前组队。",
+                "理论性太强了，缺乏实践机会。",
+                "给分很公平，只要努力了就有好成绩。"
+            ];
+            const courses = ['COMP9021', 'COMP9024', 'FINC5001', 'MKTG1001'];
+            const users = ['Alice', 'Bob', 'Charlie', 'David', 'Eve'];
+            const statuses = ['pending', 'published', 'rejected'];
+
+            for(let i = 1; i <= 24; i++) {
+                const status = statuses[Math.floor(Math.random() * statuses.length)];
+                mockReviews.push({
+                    id: i,
+                    content: contents[Math.floor(Math.random() * contents.length)],
+                    course: courses[Math.floor(Math.random() * courses.length)],
+                    user: users[Math.floor(Math.random() * users.length)],
+                    score: Math.floor(Math.random() * 2) + 3, // 3-5 stars
+                    date: new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString().split('T')[0],
+                    status: status,
+                    rejectReason: status === 'rejected' ? '内容包含违规词汇' : null
+                });
+            }
+            // Sort by pending first, then date
+            mockReviews.sort((a, b) => {
+                if(a.status === 'pending' && b.status !== 'pending') return -1;
+                if(a.status !== 'pending' && b.status === 'pending') return 1;
+                return new Date(b.date) - new Date(a.date);
+            });
+        }
+
+        function renderReviews() {
+            const tbody = document.getElementById('reviews-table-body');
+            const emptyState = document.getElementById('reviews-empty-state');
+            const pendingCountEl = document.getElementById('review-pending-count');
+            const searchInput = document.getElementById('review-search');
+            const statusFilter = document.getElementById('review-status-filter');
+
+            if(!tbody) return;
+
+            if(mockReviews.length === 0) generateMockReviews();
+
+            // Update global pending count
+            const pendingCount = mockReviews.filter(r => r.status === 'pending').length;
+            if(pendingCountEl) pendingCountEl.textContent = pendingCount;
+
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            const statusValue = statusFilter ? statusFilter.value : 'all';
+
+            // 1. Filter
+            const filtered = mockReviews.filter(r => {
+                const matchSearch = r.content.toLowerCase().includes(searchTerm) || r.user.toLowerCase().includes(searchTerm);
+                const matchStatus = statusValue === 'all' || r.status === statusValue;
+                return matchSearch && matchStatus;
+            });
+
+            // 2. Pagination
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / reviewState.pageSize);
+            
+            if (reviewState.page > totalPages && totalPages > 0) reviewState.page = totalPages;
+            if (reviewState.page < 1) reviewState.page = 1;
+
+            const start = (reviewState.page - 1) * reviewState.pageSize;
+            const end = Math.min(start + reviewState.pageSize, total);
+            const pageData = filtered.slice(start, end);
+
+            // 3. Render
+            if (pageData.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                updateReviewPaginationUI(0, 0, 0, 1);
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = pageData.map(r => {
+                let statusHtml = '';
+                if(r.status === 'published') statusHtml = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">已发布</span>`;
+                else if(r.status === 'pending') statusHtml = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">待审核</span>`;
+                else if(r.status === 'rejected') statusHtml = `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 cursor-pointer" title="点击查看原因" onclick="openReviewDetail(${r.id})">已驳回 <i class="ph-bold ph-info ml-1"></i></span>`;
+
+                const truncatedContent = r.content.length > 20 ? r.content.substring(0, 20) + '...' : r.content;
+
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            <div class="text-sm text-gray-900 line-clamp-2" title="${r.content}">${truncatedContent}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${r.course}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${r.user}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-yellow-500">
+                            <i class="ph-fill ph-star"></i> ${r.score}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${r.date}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">${statusHtml}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="openReviewDetail(${r.id})" class="text-indigo-600 hover:text-indigo-900 mr-3">详情</button>
+                            <button onclick="deleteReview(${r.id})" class="text-red-600 hover:text-red-900">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateReviewPaginationUI(start + 1, end, total, totalPages);
+        }
+
+        function updateReviewPaginationUI(start, end, total, totalPages) {
+            const container = document.getElementById('reviews-pagination');
+            if(!container) return;
+            container.innerHTML = `
+                <div class="text-sm text-gray-500">
+                    显示 <span class="font-medium">${start}</span> 到 <span class="font-medium">${end}</span> 条，共 <span class="font-medium">${total}</span> 条
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="changeReviewPage(-1)" ${reviewState.page <= 1 ? 'disabled' : ''} class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        上一页
+                    </button>
+                    <span class="text-sm text-gray-700">第 <span class="font-medium">${reviewState.page}</span> 页</span>
+                    <button onclick="changeReviewPage(1)" ${reviewState.page >= totalPages ? 'disabled' : ''} class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                        下一页
+                    </button>
+                </div>
+            `;
+        }
+
+        function changeReviewPage(delta) {
+            reviewState.page += delta;
+            renderReviews();
+        }
+
+        function deleteReview(id) {
+            if(confirm('确定要删除这条评价吗？此操作不可恢复。')) {
+                mockReviews = mockReviews.filter(r => r.id !== id);
+                renderReviews();
+            }
+        }
+
+        // Review Detail Drawer Logic
+        function openReviewDetail(id) {
+            const review = mockReviews.find(r => r.id === id);
+            if(!review) return;
+            
+            reviewState.currentReviewId = id;
+            
+            // Populate Drawer Data
+            document.getElementById('review-detail-user').textContent = review.user;
+            document.getElementById('review-detail-avatar').textContent = review.user.charAt(0);
+            document.getElementById('review-detail-date').textContent = review.date;
+            document.getElementById('review-detail-course').textContent = review.course;
+            document.getElementById('review-detail-content').textContent = review.content;
+            document.getElementById('review-detail-score').innerHTML = `<i class="ph-fill ph-star mr-1"></i> ${review.score}`;
+            
+            // Status Badge
+            const statusEl = document.getElementById('review-detail-status');
+            if(review.status === 'published') statusEl.innerHTML = `<span class="px-2 py-1 rounded text-xs font-bold bg-green-100 text-green-800">已发布</span>`;
+            else if(review.status === 'pending') statusEl.innerHTML = `<span class="px-2 py-1 rounded text-xs font-bold bg-yellow-100 text-yellow-800">待审核</span>`;
+            else if(review.status === 'rejected') statusEl.innerHTML = `<span class="px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-800">已驳回</span>`;
+
+            // Conditional Views
+            const rejectContainer = document.getElementById('review-detail-reject-reason-container');
+            const rejectReason = document.getElementById('review-detail-reject-reason');
+            const moderationInput = document.getElementById('review-moderation-input');
+            const rejectInput = document.getElementById('review-reject-input');
+
+            if(review.status === 'rejected') {
+                rejectContainer.classList.remove('hidden');
+                rejectReason.textContent = review.rejectReason || '无具体原因';
+                moderationInput.classList.add('hidden');
+            } else if(review.status === 'pending') {
+                rejectContainer.classList.add('hidden');
+                moderationInput.classList.remove('hidden');
+                rejectInput.value = ''; // clear input
+            } else {
+                rejectContainer.classList.add('hidden');
+                moderationInput.classList.add('hidden');
+            }
+
+            // Open Drawer
+            const drawer = document.getElementById('reviewDetailDrawer');
+            const content = document.getElementById('reviewDetailContent');
+            drawer.classList.remove('hidden');
+            void drawer.offsetWidth;
+            drawer.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('translate-x-full');
+        }
+
+        function closeReviewDetailDrawer() {
+            const drawer = document.getElementById('reviewDetailDrawer');
+            const content = document.getElementById('reviewDetailContent');
+            content.classList.add('translate-x-full');
+            drawer.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { drawer.classList.add('hidden'); }, 300);
+            reviewState.currentReviewId = null;
+        }
+
+        function approveReview() {
+            if(!reviewState.currentReviewId) return;
+            const review = mockReviews.find(r => r.id === reviewState.currentReviewId);
+            if(review) {
+                review.status = 'published';
+                renderReviews();
+                closeReviewDetailDrawer();
+                alert('审核通过！评价已发布。');
+            }
+        }
+
+        function rejectReview() {
+            if(!reviewState.currentReviewId) return;
+            const reason = document.getElementById('review-reject-input').value.trim();
+            if(!reason) {
+                alert('请填写驳回原因');
+                return;
+            }
+            const review = mockReviews.find(r => r.id === reviewState.currentReviewId);
+            if(review) {
+                review.status = 'rejected';
+                review.rejectReason = reason;
+                renderReviews();
+                closeReviewDetailDrawer();
+                alert('评价已驳回。');
+            }
+        }
+
+        // University Management Logic
+        let universities = [
+            {
+                id: 1,
+                nameCN: '新南威尔士大学',
+                nameEN: 'University of New South Wales',
+                code: 'UNSW',
+                country: '澳大利亚',
+                flag: '🇦🇺',
+                images: [
+                    'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+                    'https://images.unsplash.com/photo-1592280771884-1d1b15151c8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+                ],
+                desc: '世界顶尖研究型大学，澳大利亚八校联盟成员之一，以工科和商科著称。',
+                terms: ['T1', 'T2', 'T3', 'Summer']
+            },
+            {
+                id: 2,
+                nameCN: '悉尼大学',
+                nameEN: 'The University of Sydney',
+                code: 'USYD',
+                country: '澳大利亚',
+                flag: '🇦🇺',
+                images: [
+                    'https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+                ],
+                desc: '澳大利亚历史最悠久的大学，南半球首屈一指的学术殿堂。',
+                terms: ['S1', 'S2', 'Summer']
+            },
+            {
+                id: 3,
+                nameCN: '墨尔本大学',
+                nameEN: 'The University of Melbourne',
+                code: 'Melb',
+                country: '澳大利亚',
+                flag: '🇦🇺',
+                images: [
+                    'https://images.unsplash.com/photo-1517457373958-b7bdd4587205?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+                ],
+                desc: '享誉全球的顶尖公立研究型大学，在多个学科领域名列前茅。',
+                terms: ['S1', 'S2', 'Summer']
+            },
+            {
+                id: 4,
+                nameCN: '昆士兰大学',
+                nameEN: 'The University of Queensland',
+                code: 'UQ',
+                country: '澳大利亚',
+                flag: '🇦🇺',
+                images: [
+                    'https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+                ],
+                desc: '澳大利亚常春藤名校，科研实力雄厚，校园环境优美。',
+                terms: ['S1', 'S2']
+            },
+            {
+                id: 5,
+                nameCN: '莫纳什大学',
+                nameEN: 'Monash University',
+                code: 'Monash',
+                country: '澳大利亚',
+                flag: '🇦🇺',
+                images: [
+                    'https://images.unsplash.com/photo-1590579491624-f98f36d4c763?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+                ],
+                desc: '澳大利亚规模最大的大学之一，拥有多个校区和广泛的国际合作。',
+                terms: ['S1', 'S2']
+            }
+        ];
+
+        function renderUniversities() {
+            const grid = document.getElementById('university-grid');
+            if(!grid) return;
+
+            grid.innerHTML = universities.map(uni => `
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition group">
+                    <div class="h-60 bg-gray-100 relative">
+                        <img src="${uni.images[0]}" alt="${uni.nameEN}" class="w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold shadow-sm">
+                            ${uni.code}
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg line-clamp-1" title="${uni.nameCN}">${uni.nameCN}</h3>
+                                <p class="text-xs text-gray-500 line-clamp-1" title="${uni.nameEN}">${uni.nameEN}</p>
+                            </div>
+                            <span class="text-xl">${uni.flag} ${uni.country}</span>
+                        </div>
+                        
+                        <p class="text-sm text-gray-600 mb-4 line-clamp-2 h-10">${uni.desc}</p>
+                        
+                        <div class="mb-4">
+                            <div class="flex flex-wrap gap-1">
+                                ${uni.terms.map(t => `<span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700">${t}</span>`).join('')}
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end space-x-3 pt-3 border-t border-gray-100">
+                            <button onclick="alert('编辑院校: ${uni.nameCN}')" class="text-sm text-gray-500 hover:text-primary flex items-center transition">
+                                <i class="ph-bold ph-pencil-simple mr-1"></i> 编辑
+                            </button>
+                            <button onclick="alert('删除院校: ${uni.nameCN}')" class="text-sm text-gray-500 hover:text-red-500 flex items-center transition">
+                                <i class="ph-bold ph-trash mr-1"></i> 删除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        let mockTeachers = [];
+        let teacherState = {
+            page: 1,
+            pageSize: 10
+        };
+        
+        function generateMockTeachers() {
+            const firstNames = ['David', 'Sarah', 'Michael', 'Emma', 'James', 'Lisa', 'Robert', 'Emily', 'William', 'Jessica', 'Thomas', 'Jennifer', 'Charles', 'Michelle', 'Daniel', 'Amanda', 'Matthew', 'Ashley', 'Anthony', 'Nicole', 'George', 'Sophia', 'Brian', 'Olivia'];
+            const lastNames = ['Wilson', 'Taylor', 'Anderson', 'Thomas', 'Jackson', 'White', 'Harris', 'Martin', 'Thompson', 'Garcia', 'Martinez', 'Robinson', 'Clark', 'Rodriguez', 'Lewis', 'Lee', 'Walker', 'Hall', 'Allen', 'Young', 'King', 'Wright', 'Lopez', 'Hill'];
+            const unis = ['UNSW', 'USYD', 'Monash', 'UQ', 'Melb'];
+            const coursesPool = ['COMP9021', 'COMP9024', 'FINC5001', 'MKTG1001', 'ECON1101', 'MATH1131', 'ENGG1000', 'ARTS1090'];
+            
+            for (let i = 1; i <= 24; i++) {
+                const fname = firstNames[i-1];
+                const lname = lastNames[i-1];
+                // Random 1-2 universities
+                const teacherUnis = [];
+                const numUnis = Math.random() > 0.8 ? 2 : 1; // 10% chance to be in 2 unis
+                for(let k=0; k<numUnis; k++) {
+                    const u = unis[Math.floor(Math.random() * unis.length)];
+                    if(!teacherUnis.includes(u)) teacherUnis.push(u);
+                }
+
+                const isLecturer = Math.random() > 0.3; // 70% Lecturers
+                
+                // Random 1-3 courses
+                const taughtCourses = [];
+                const numCourses = Math.floor(Math.random() * 3) + 1;
+                for(let j=0; j<numCourses; j++) {
+                    const c = coursesPool[Math.floor(Math.random() * coursesPool.length)];
+                    if(!taughtCourses.includes(c)) taughtCourses.push(c);
+                }
+
+                mockTeachers.push({
+                    id: i,
+                    name: `${fname} ${lname}`,
+                    email: `${fname.toLowerCase()}.${lname.toLowerCase()}@${teacherUnis[0].toLowerCase()}.edu.au`,
+                    avatar: null,
+                    unis: teacherUnis,
+                    type: isLecturer ? 'Lecturer' : 'Tutor',
+                    courses: taughtCourses,
+                    rating: null // Reserved
+                });
+            }
+        }
+
+        function renderTeachers() {
+            const tbody = document.getElementById('teachers-table-body');
+            const emptyState = document.getElementById('teachers-empty-state');
+            const totalCount = document.getElementById('teacher-total-count');
+            const searchInput = document.getElementById('teacher-search');
+            
+            if(!tbody) return;
+
+            if(mockTeachers.length === 0) generateMockTeachers();
+
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+            
+            // 1. Filter
+            const filtered = mockTeachers.filter(t => 
+                t.name.toLowerCase().includes(searchTerm) || 
+                t.email.toLowerCase().includes(searchTerm)
+            );
+
+            // 2. Pagination Logic
+            const total = filtered.length;
+            const totalPages = Math.ceil(total / teacherState.pageSize);
+
+            // Adjust page if out of bounds
+            if (teacherState.page > totalPages && totalPages > 0) teacherState.page = totalPages;
+            if (teacherState.page < 1) teacherState.page = 1;
+
+            const start = (teacherState.page - 1) * teacherState.pageSize;
+            const end = Math.min(start + teacherState.pageSize, total);
+            const pageData = filtered.slice(start, end);
+
+            // 3. Render Table
+            if(totalCount) totalCount.textContent = total;
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                // Disable buttons
+                updateTeacherPaginationUI(0, 0, 0, 1);
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            tbody.innerHTML = pageData.map(t => {
+                // Avatar
+                const avatarHtml = t.avatar 
+                    ? `<img src="${t.avatar}" class="h-10 w-10 rounded-full">`
+                    : `<div class="h-10 w-10 rounded-full bg-indigo-50 flex items-center justify-center text-primary font-bold text-sm">${t.name.charAt(0)}</div>`;
+
+                // Type Badge
+                const typeBadge = t.type === 'Lecturer' 
+                    ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">讲师</span>`
+                    : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">助教</span>`;
+
+                // Courses
+                const coursesHtml = t.courses.map(c => 
+                    `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mr-1 mb-1">${c}</span>`
+                ).join('');
+
+                // Unis
+                const unisHtml = t.unis.map(u => 
+                    `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-100 text-orange-800 mr-1">${u}</span>`
+                ).join('');
+
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10">
+                                    ${avatarHtml}
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${t.name}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${t.email}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                             <div class="flex flex-wrap max-w-xs">
+                                ${unisHtml}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            ${typeBadge}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-wrap max-w-xs">
+                                ${coursesHtml}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 italic">
+                            ${t.rating !== null ? t.rating : '暂无评分'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onclick="alert('编辑教师: ${t.name}')" class="text-indigo-600 hover:text-indigo-900 mr-3">编辑</button>
+                            <button onclick="alert('删除教师: ${t.name}')" class="text-red-600 hover:text-red-900">删除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // 4. Update Pagination Controls
+            updateTeacherPaginationUI(start + 1, end, total, totalPages);
+        }
+
+        function updateTeacherPaginationUI(start, end, total, totalPages) {
+            // We need to inject pagination HTML if it doesn't exist or update it
+            const paginationContainer = document.querySelector('#page-teachers .bg-white .border-t');
+            if(paginationContainer) {
+                paginationContainer.innerHTML = `
+                    <div class="text-sm text-gray-500">
+                        显示 <span class="font-medium">${start}</span> 到 <span class="font-medium">${end}</span> 条，共 <span class="font-medium">${total}</span> 条
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="changeTeacherPage(-1)" ${teacherState.page <= 1 ? 'disabled' : ''} class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            上一页
+                        </button>
+                        <span class="text-sm text-gray-700">第 <span class="font-medium">${teacherState.page}</span> 页</span>
+                        <button onclick="changeTeacherPage(1)" ${teacherState.page >= totalPages ? 'disabled' : ''} class="px-3 py-1 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+                            下一页
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        function changeTeacherPage(delta) {
+            teacherState.page += delta;
+            renderTeachers();
+        }
+
+        // University Modal Logic
+        function openUniversityModal() {
+            const modal = document.getElementById('universityModal');
+            const content = document.getElementById('universityModalContent');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth;
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('translate-x-full');
+        }
+
+        function closeUniversityModal() {
+            const modal = document.getElementById('universityModal');
+            const content = document.getElementById('universityModalContent');
+            content.classList.add('translate-x-full');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            
+            // Reset form
+            document.getElementById('uniNameCN').value = '';
+            document.getElementById('uniCode').value = '';
+            document.getElementById('uniNameEN').value = '';
+            document.getElementById('uniImage').value = '';
+            document.getElementById('uniDesc').value = '';
+            document.querySelectorAll('input[name="uniTerm"]').forEach(cb => cb.checked = false);
+            document.querySelector('input[name="uniCountry"][value="Australia"]').checked = true;
+        }
+
+        function handleUniversitySubmit(e) {
+            e.preventDefault();
+            
+            const nameCN = document.getElementById('uniNameCN').value;
+            const code = document.getElementById('uniCode').value;
+            const nameEN = document.getElementById('uniNameEN').value;
+            const image = document.getElementById('uniImage').value;
+            const desc = document.getElementById('uniDesc').value;
+            
+            const countryInput = document.querySelector('input[name="uniCountry"]:checked');
+            const country = countryInput.getAttribute('data-name');
+            const flag = countryInput.getAttribute('data-flag');
+
+            const selectedTerms = [];
+            document.querySelectorAll('input[name="uniTerm"]:checked').forEach(cb => {
+                selectedTerms.push(cb.value);
+            });
+
+            const newUni = {
+                id: universities.length + 1,
+                nameCN: nameCN,
+                nameEN: nameEN,
+                code: code,
+                country: country,
+                flag: flag,
+                images: [image],
+                desc: desc || '暂无简介',
+                terms: selectedTerms
+            };
+
+            universities.unshift(newUni);
+            renderUniversities();
+            closeUniversityModal();
+            alert('院校新增成功！');
+        }
+
+        // Teacher Modal Logic
+        function openTeacherModal() {
+            const modal = document.getElementById('teacherModal');
+            const content = document.getElementById('teacherModalContent');
+            modal.classList.remove('hidden');
+            void modal.offsetWidth; // trigger reflow
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        }
+
+        function closeTeacherModal() {
+            const modal = document.getElementById('teacherModal');
+            const content = document.getElementById('teacherModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+            
+            // Reset form
+            document.getElementById('teacherName').value = '';
+            document.getElementById('teacherEmail').value = '';
+            document.querySelectorAll('input[name="teacherUni"]').forEach(cb => cb.checked = false);
+            document.querySelector('input[name="teacherType"][value="Lecturer"]').checked = true;
+        }
+
+        function handleTeacherSubmit(e) {
+            e.preventDefault();
+            
+            // Get values
+            const name = document.getElementById('teacherName').value;
+            const email = document.getElementById('teacherEmail').value;
+            const type = document.querySelector('input[name="teacherType"]:checked').value;
+            
+            const selectedUnis = [];
+            document.querySelectorAll('input[name="teacherUni"]:checked').forEach(cb => {
+                selectedUnis.push(cb.value);
+            });
+
+            if (selectedUnis.length === 0) {
+                alert('请至少选择一所所属院校');
+                return;
+            }
+
+            const newTeacher = {
+                id: mockTeachers.length + 1,
+                name: name,
+                email: email,
+                avatar: null,
+                unis: selectedUnis,
+                type: type,
+                courses: [], // Empty for new teacher
+                rating: null
+            };
+
+            mockTeachers.unshift(newTeacher);
+            
+            // Reset filters/pagination to show new teacher
+            document.getElementById('teacher-search').value = '';
+            teacherState.page = 1;
+            
+            renderTeachers();
+            closeTeacherModal();
+            alert('教师录入成功！');
         }
 
         // Initialize
