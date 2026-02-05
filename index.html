@@ -86,13 +86,25 @@
 						<span class="text-lg font-bold text-gray-900">选学期</span>
 						<span class="text-red-500 ml-1">*</span>
 					</div>
-					<select id="drawer-term-select" class="w-full sm:w-40 bg-indigo-50 border border-indigo-100 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5">
-						<option value="多学期">多学期</option>
-						<option value="2024T3">2024 T3</option>
-						<option value="2024T2">2024 T2</option>
-						<option value="2024T1">2024 T1</option>
-						<option value="2023T3">2023 T3</option>
-					</select>
+					<div class="flex gap-4">
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">学年</label>
+                            <select id="drawer-year-select" class="w-full bg-indigo-50 border border-indigo-100 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5">
+                                <!-- Populated by JS -->
+                            </select>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">学期</label>
+                            <select id="drawer-term-select" class="w-full bg-indigo-50 border border-indigo-100 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5">
+                                <option value="T1">T1</option>
+                                <option value="T2">T2</option>
+                                <option value="T3">T3</option>
+                                <option value="Summer">Summer</option>
+                                <option value="S1">S1</option>
+                                <option value="S2">S2</option>
+                            </select>
+                        </div>
+                    </div>
 				</div>
 
 					<!-- Ratings -->
@@ -1006,7 +1018,9 @@
                     { 
                         id: 'r1',
                         user: 'Alex', 
-                        term: '2024 T3', 
+                        term: 'T3', 
+                        year: '2024',
+                        tags: ['干货满满', '作业多'],
                         content: '课程内容非常扎实，Eric老师讲得很好，但是作业量真的很大，建议提前预习。', 
                         date: '2024-12-10', 
                         likes: 12,
@@ -1019,7 +1033,9 @@
                     { 
                         id: 'r2',
                         user: 'Sarah', 
-                        term: '2024 T1', 
+                        term: 'T1', 
+                        year: '2024',
+                        tags: ['水课', '给分好'],
                         content: '对于没有编程基础的人来说有点难，需要花大量时间练习。', 
                         date: '2024-05-20', 
                         likes: 8,
@@ -1049,7 +1065,9 @@
                     { 
                         id: 'r3',
                         user: 'Tom', 
-                        term: '2024 S2', 
+                        term: 'S2', 
+                        year: '2024',
+                        tags: ['考试难', '挂科率高'],
                         content: '理论性很强，考试很难，挂科率确实不低，大家小心。', 
                         date: '2024-11-15', 
                         likes: 25,
@@ -1063,7 +1081,9 @@
                     { 
                         id: 'r4',
                         user: 'Jerry', 
-                        term: '2024 S1', 
+                        term: 'S1', 
+                        year: '2024',
+                        tags: ['比较枯燥', '慎选'],
                         content: '老师讲得比较枯燥，容易睡着。', 
                         date: '2024-06-10', 
                         likes: 5,
@@ -1090,7 +1110,9 @@
                 reviews: [
                     { 
                         user: 'Alice', 
-                        term: '2024 S2', 
+                        term: 'S2', 
+                        year: '2024',
+                        tags: ['水课', '给分好'],
                         content: '真正的水课，给分超好，推荐！', 
                         date: '2024-11-20', 
                         likes: 40,
@@ -1116,7 +1138,20 @@
                 grading: { val: 3.0, text: '适中' },
                 harvest: { val: 3.0, text: '一般' }
             },
-            reviews: []
+            reviews: [
+                { 
+                    user: 'David', 
+                    term: 'T2', 
+                    year: '2024',
+                    tags: ['干货满满', '理论性强'],
+                    content: '这是一条针对其他课程的默认评价示例。课程内容很丰富，但需要投入时间。', 
+                    date: '2024-08-15', 
+                    likes: 2,
+                    isLiked: false,
+                    rating: 4.0,
+                    replies: []
+                }
+            ]
         };
 
         // 3. 渲染课程卡片
@@ -1150,15 +1185,6 @@
                     </div>
                 </div>
             `).join('');
-        }
-
-        function getTagColor(tag) {
-            if (GOOD_TAGS.includes(tag)) {
-                return 'bg-green-100 text-green-800';
-            } else if (BAD_TAGS.includes(tag)) {
-                return 'bg-red-100 text-red-800';
-            }
-            return 'bg-gray-100 text-gray-800';
         }
 
         // 4. 认证逻辑 (SessionStorage)
@@ -1333,6 +1359,27 @@
         let drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
         let pageRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
         
+        // Initialize Year Select
+        function initYearSelect() {
+            const yearSelect = document.getElementById('drawer-year-select');
+            if(!yearSelect) return;
+            
+            const currentYear = new Date().getFullYear();
+            const startYear = 2000;
+            const endYear = 2026;
+            
+            let options = '';
+            for(let y = endYear; y >= startYear; y--) {
+                options += `<option value="${y}" ${y === currentYear ? 'selected' : ''}>${y}</option>`;
+            }
+            yearSelect.innerHTML = options;
+        }
+
+        // Call init on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initYearSelect();
+        });
+        
         function openReviewDrawer(courseCode) {
             if (!isLogged()) {
                 openLoginModal();
@@ -1344,7 +1391,7 @@
             document.getElementById('drawer-course-code').innerText = course.code;
             
             // Reset form
-            document.getElementById('drawer-term-select').value = '多学期';
+            // document.getElementById('drawer-term-select').value = 'T1'; // Default
             document.getElementById('drawer-review-content').value = '';
             drawerRatings = { difficulty: 0, homework: 0, grading: 0, harvest: 0, tags: [] };
             
@@ -1438,7 +1485,33 @@
                 openLoginModal();
                 return;
             }
-            // Mock submission
+            const currentUser = JSON.parse(sessionStorage.getItem('irbtree_user'));
+            
+            const year = document.getElementById('drawer-year-select').value;
+            const term = document.getElementById('drawer-term-select').value;
+            const content = document.getElementById('drawer-review-content').value;
+
+            if (content.length < 10) {
+                alert('评论内容太短，请至少输入10个字。');
+                return;
+            }
+
+            // In real app, send data to backend
+            const newReview = {
+                id: 'r_new_' + Date.now(),
+                user: currentUser.name,
+                term: term,
+                year: year,
+                content: content,
+                date: new Date().toISOString().split('T')[0],
+                likes: 0,
+                rating: 0, // Should be calculated from stars
+                isLiked: false,
+                replies: []
+            };
+
+            // Here we would push to courseDetailsMap[code].reviews
+            // For demo, just close and alert
             alert('评论提交成功！');
             closeReviewDrawer();
         }
@@ -1912,14 +1985,112 @@
                  bookmarkBtn.classList.remove('text-gray-400', 'border-gray-100');
                  bookmarkBtn.classList.add('text-yellow-500', 'border-yellow-500');
             }
-            
             // Populate Reviews
-            renderReviews(detail.reviews);
+            renderReviews(detail.reviews, courseCode);
 
             // Switch View
             switchTab(event, 'course-detail');
             // Scroll to top
             window.scrollTo(0, 0);
+        }
+
+        // Helper to get tag color class
+        function getTagColor(tag) {
+            const tagTypes = {
+                '干货满满': 'recommended',
+                '给分好': 'recommended',
+                '作业多': 'not_recommended',
+                '考试难': 'not_recommended',
+                '挂科率高': 'not_recommended',
+                '慎选': 'not_recommended',
+                '快逃': 'not_recommended',
+                '水课': 'neutral',
+                '理论性强': 'neutral',
+                '比较枯燥': 'not_recommended'
+            };
+            
+            const type = tagTypes[tag] || 'neutral';
+            
+            if (type === 'recommended') return 'bg-green-50 text-green-700 border border-green-200';
+            if (type === 'not_recommended') return 'bg-red-50 text-red-700 border border-red-200';
+            return 'bg-gray-100 text-gray-800 border border-gray-200';
+        }
+
+        // 7. Render Reviews (Separated Function)
+        function renderReviews(reviews, courseCode) {
+            const reviewsContainer = document.getElementById('detail-reviews-list');
+            if (reviews && reviews.length > 0) {
+                reviewsContainer.innerHTML = reviews.map(review => `
+                <!-- Review Item Template -->
+                <div class="border-b border-gray-100 py-6 last:border-0">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center">
+                            <div class="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-primary font-bold text-lg mr-3">
+                                ${review.user.charAt(0)}
+                            </div>
+                            <div>
+                                <div class="font-bold text-gray-900 flex items-center">
+                                    ${review.user}
+                                    <span class="ml-2 text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">${review.year} ${review.term}</span>
+                                </div>
+                                <div class="flex items-center text-xs text-gray-500 mt-0.5">
+                                    <span>${review.date}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center bg-yellow-50 px-2 py-1 rounded-lg">
+                            <i class="ph-fill ph-star text-yellow-400 mr-1 text-sm"></i>
+                            <span class="font-bold text-gray-900 text-sm">${review.rating}</span>
+                        </div>
+                    </div>
+                    
+                    <p class="text-gray-700 text-sm leading-relaxed mb-3">
+                        ${(review.tags || []).map(tag => `<span class="inline-flex items-center text-primary font-medium hover:underline cursor-pointer mr-1">#${tag}</span>`).join('')}
+                        ${review.content}
+                    </p>
+                    
+                    <!-- Action Bar -->
+                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                        <button class="flex items-center space-x-1 hover:text-red-500 transition ${review.isLiked ? 'text-red-500' : ''}">
+                            <i class="${review.isLiked ? 'ph-fill' : 'ph-bold'} ph-thumbs-up text-lg"></i>
+                            <span>${review.likes}</span>
+                        </button>
+                        <button class="flex items-center space-x-1 hover:text-primary transition">
+                            <i class="ph-bold ph-chat-circle text-lg"></i>
+                            <span>${review.replies.length} 回复</span>
+                        </button>
+                    </div>
+
+                    <!-- Replies -->
+                    ${review.replies.length > 0 ? `
+                        <div class="mt-4 pl-4 border-l-2 border-gray-100 space-y-3">
+                            ${review.replies.map(reply => `
+                                <div class="bg-gray-50 rounded-lg p-3">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="font-bold text-xs text-gray-900">${reply.user}</span>
+                                        <span class="text-xs text-gray-400">${reply.date}</span>
+                                    </div>
+                                    <p class="text-xs text-gray-600">${reply.content}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+                `).join('');
+            } else {
+                reviewsContainer.innerHTML = `
+                    <div class="text-center py-12">
+                        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
+                            <i class="ph-duotone ph-chat-teardrop-text text-3xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-sm font-medium text-gray-900">暂无评价</h3>
+                        <p class="mt-1 text-sm text-gray-500">成为第一个评价这门课的人吧！</p>
+                        <button onclick="openReviewDrawer('${courseCode}')" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary">
+                            写评价
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         function toggleCourseLike(btn) {
@@ -2140,104 +2311,6 @@
             
             // Hide box
             toggleReplyBox(null, reviewId);
-        }
-
-        function renderReviews(reviews) {
-            const list = document.getElementById('detail-reviews-list');
-            if (!reviews || reviews.length === 0) {
-                list.innerHTML = '<p class="text-gray-500 text-center py-8">暂无评价，快来抢沙发吧！</p>';
-                return;
-            }
-            
-            list.innerHTML = reviews.map(review => {
-                // Generate rating stars
-                const fullStars = Math.floor(review.rating);
-                const hasHalfStar = review.rating % 1 !== 0;
-                let starsHtml = '';
-                for (let i = 0; i < 5; i++) {
-                    if (i < fullStars) {
-                        starsHtml += '<i class="ph-fill ph-star text-yellow-400 text-sm"></i>';
-                    } else if (i === fullStars && hasHalfStar) {
-                         starsHtml += '<i class="ph-fill ph-star-half text-yellow-400 text-sm"></i>';
-                    } else {
-                         starsHtml += '<i class="ph-fill ph-star text-gray-300 text-sm"></i>';
-                    }
-                }
-
-                // Generate replies HTML
-                let repliesHtml = '';
-                if (review.replies && review.replies.length > 0) {
-                    repliesHtml = `
-                        <div class="mt-4 bg-gray-50 rounded-lg p-4 space-y-3">
-                            ${review.replies.map(reply => `
-                                <div class="flex items-start space-x-3 mb-6 last:mb-0">
-                                    <div class="flex-shrink-0">
-                                        <div class="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 text-xs font-bold">
-                                            ${reply.user.charAt(0)}
-                                        </div>
-                                    </div>
-                                    <div class="flex-grow">
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-sm font-bold text-gray-900">${reply.user}</span>
-                                            <span class="text-xs text-gray-500">${reply.date}</span>
-                                        </div>
-                                        <p class="text-sm text-gray-600 mt-2">${reply.content}</p>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                }
-
-                return `
-                <div class="flex space-x-4">
-                    <div class="flex-shrink-0">
-                        <div class="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold">
-                            ${review.user.charAt(0)}
-                        </div>
-                    </div>
-                    <div class="flex-grow">
-                        <!-- Header: User info + Date -->
-                        <div class="flex items-center justify-between mb-1">
-                            <h4 class="text-sm font-bold text-gray-900">
-								<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700 mr-2">
-                                  ${review.term}
-                                </span>
-								${review.user}
-							</h4>
-                            <span class="text-xs text-gray-500">${review.date}</span>
-                        </div>
-
-                        <!-- Rating Row -->
-                        <div class="flex items-center mb-2 space-x-2">
-                             <div class="flex items-center">
-                                ${starsHtml}
-                             </div>
-                             <span class="text-sm font-bold text-gray-900">${review.rating.toFixed(1)}</span>
-                        </div>
-
-                        <!-- Review Content -->
-                        <p class="text-sm text-gray-600 mb-3">${review.content}</p>
-
-                        <!-- Action Row -->
-                        <div class="flex items-center space-x-6">
-                            <button onclick="toggleReviewLike(this, ${review.likes})" class="flex items-center text-xs transition ${review.isLiked ? 'text-primary font-bold' : 'text-gray-500 hover:text-primary'}">
-                                <i class="${review.isLiked ? 'ph-fill' : 'ph'} ph-thumbs-up mr-1 text-lg"></i> 有用 (${review.likes})
-                            </button>
-                            <button onclick="toggleReplyBox(this, '${review.id}')" class="flex items-center text-xs text-gray-500 hover:text-primary transition">
-                                <i class="ph ph-chat-circle mr-1 text-lg"></i> 回复 (${review.replies ? review.replies.length : 0})
-                            </button>
-                        </div>
-
-                        <!-- Reply Input Box Container -->
-                        <div id="reply-box-${review.id}" class="hidden mt-4 mb-4 transition-all duration-300 ease-in-out"></div>
-
-                        <!-- Nested Replies -->
-                        ${repliesHtml}
-                    </div>
-                </div>
-                <div class="border-b border-gray-100 last:border-0"></div>
-            `}).join('');
         }
         
         // 7. 模态框控制
