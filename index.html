@@ -193,49 +193,64 @@
     <!-- ================= Main Content ================= -->
     <main class="flex-grow relative">
       <div id="view-home" class="tab-content block">
-				<!-- Hero Section & Search -->
-				<div class="bg-white pb-16 pt-12 lg:pt-20">
-					<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-						<h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mb-4">
-								拒绝挂科，<span class="text-primary">选课不踩雷</span>
-						</h1>
-						<p class="text-xl text-gray-500 max-w-4xl mx-auto my-10">
-							澳洲留学生专属的课程评价平台，查看真实学长学姐评价，查询 GPA 杀手课与水课。
-						</p>
+        <!-- Hero Section & Search -->
+        <div class="relative bg-gradient-to-b from-indigo-50/50 via-white to-white pb-16 pt-12 lg:pt-20">
+            <!-- Decorative Elements -->
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-indigo-100/50 blur-3xl"></div>
+                <div class="absolute top-1/2 -right-24 w-64 h-64 rounded-full bg-blue-100/50 blur-3xl"></div>
+            </div>
 
-						<!-- Search Bar -->
-						<div class="relative max-w-3xl mx-auto mb-12 group">
-							<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-								<i class="ph ph-magnifying-glass text-gray-400 text-xl"></i>
-							</div>
-							<input type="text" 
-								class="block w-full pl-12 pr-32 py-4 border-2 border-gray-200 rounded-full leading-5 bg-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-indigo-100 sm:text-lg transition shadow-sm group-hover:shadow-md"
-								placeholder="搜索课程代码 (e.g. COMP9021) 或课程名..."
-							>
-							<div class="absolute inset-y-0 right-2 flex items-center">
-								<button onclick="handleSearch()" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full font-medium transition shadow-md">
-									搜索
-								</button>
-							</div>
-						</div>
+            <div class="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <span class="inline-block py-1 px-3 rounded-full bg-indigo-50 text-primary text-xs font-semibold tracking-wide uppercase mb-4 border border-indigo-100">
+                    2024 选课季必备
+                </span>
+                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl mb-4">
+                        拒绝挂科，<span class="text-primary relative inline-block">
+                            选课不踩雷
+                            <svg class="absolute w-full h-3 -bottom-1 left-0 text-indigo-200 -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <path d="M0 5 Q 50 10 100 5" stroke="currentColor" stroke-width="8" fill="none" />
+                            </svg>
+                        </span>
+                </h1>
+                <p class="text-xl text-gray-500 max-w-2xl mx-auto my-8 leading-relaxed">
+                    澳洲留学生专属的课程评价平台。<br class="hidden sm:block" />
+                    查看 <span class="font-bold text-gray-700">12,000+</span> 真实学长学姐评价，查询 GPA 杀手课与水课。
+                </p>
 
-						<!-- Data Stats Cards -->
-						<div class="grid grid-cols-1 gap-6 sm:grid-cols-3 mt-8">
-							<div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
-								<dt class="text-sm font-medium text-gray-500 truncate">已收录课程</dt>
-								<dd class="mt-1 text-3xl font-semibold text-primary transition">12,403</dd>
-							</div>
-							<div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
-								<dt class="text-sm font-medium text-gray-500 truncate">真实评价</dt>
-								<dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition">45,291</dd>
-							</div>
-							<div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
-								<dt class="text-sm font-medium text-gray-500 truncate">注册用户</dt>
-								<dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition">8,902</dd>
-							</div>
-						</div>
-					</div>
-				</div>
+                <!-- Search Bar -->
+                <div class="relative max-w-2xl mx-auto mb-12 group z-20">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-gray-400 text-xl"></i>
+                    </div>
+                    <input type="text" 
+                        class="block w-full pl-12 pr-32 py-4 border-2 border-gray-200 rounded-full leading-5 bg-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-4 focus:ring-indigo-100 sm:text-lg transition shadow-sm group-hover:shadow-md"
+                        placeholder="搜索课程代码 (e.g. COMP9021) 或课程名..."
+                    >
+                    <div class="absolute inset-y-0 right-2 flex items-center">
+                        <button onclick="handleSearch()" class="bg-primary hover:bg-secondary text-white px-6 py-2 rounded-full font-medium transition shadow-md">
+                            搜索
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Data Stats Cards -->
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-3 mt-8">
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
+                        <dt class="text-sm font-medium text-gray-500 truncate">已收录课程</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-primary transition">12,403</dd>
+                    </div>
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
+                        <dt class="text-sm font-medium text-gray-500 truncate">真实评价</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition">45,291</dd>
+                    </div>
+                    <div class="bg-gray-50 overflow-hidden shadow rounded-2xl border border-gray-100 p-5 flex items-center justify-center flex-col hover:bg-indigo-100 hover:border-primary scale-100 hover:scale-110 transition cursor-default">
+                        <dt class="text-sm font-medium text-gray-500 truncate">注册用户</dt>
+                        <dd class="mt-1 text-3xl font-semibold text-primary hover:text-primary transition">8,902</dd>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Popular Courses Section -->
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
