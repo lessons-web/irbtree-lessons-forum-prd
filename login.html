@@ -77,7 +77,7 @@
         </div>
 
         <!-- Login/Register Card -->
-        <div class="bg-white rounded-[2rem] shadow-xl w-full max-w-md p-10 relative z-20">
+        <div class="bg-white rounded-[2rem] shadow-xl w-full max-w-lg p-10 relative z-20">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-[#1a1a1a] mb-2" id="form-title">Agent Login</h2>
                 <p class="text-gray-500 text-sm" id="form-subtitle">Hey, Enter your details to get sign in to your account</p>
@@ -91,14 +91,16 @@
 
             <form id="auth-form" onsubmit="handleSubmit(event)">
                 <!-- Email Field -->
-                <div class="mb-4 relative">
-                    <input type="email" id="email" required
-                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
-                        placeholder="Enter School Email"
-                        onkeyup="checkSchoolDomain()">
-                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
-                        <i class="fa-regular fa-envelope"></i>
-                    </div>
+                <div class="mb-4 relative flex items-center gap-2">
+                    <input type="text" id="email-username" required
+                        class="w-[170px] px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                        placeholder="学号/用户名">
+                    <span class="text-gray-500 font-bold">@</span>
+                    <select id="email-domain" 
+                        class="flex-1 min-w-0 px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white"
+                        onchange="checkSchoolDomain()">
+                        <option value="" disabled selected>选择学校</option>
+                    </select>
                 </div>
 
                 <!-- Password Field -->
@@ -219,6 +221,17 @@
         const schoolNameBadge = document.getElementById('school-name-badge');
         const schoolNameHeader = document.getElementById('school-name-header');
         
+        // Initialize Dropdown
+        function initDropdown() {
+            const select = document.getElementById('email-domain');
+            for (const domain in SCHOOLS) {
+                const option = document.createElement('option');
+                option.value = domain;
+                option.innerText = domain;
+                select.appendChild(option);
+            }
+        }
+
         // Functions
         function toggleMode() {
             isLoginMode = !isLoginMode;
@@ -261,9 +274,15 @@
             }
         }
 
+        function getFullEmail() {
+            const username = document.getElementById('email-username').value;
+            const domain = document.getElementById('email-domain').value;
+            if (!username || !domain) return null;
+            return `${username}@${domain}`;
+        }
+
         function checkSchoolDomain() {
-            const email = document.getElementById('email').value;
-            const domain = email.split('@')[1];
+            const domain = document.getElementById('email-domain').value;
 
             if (domain && SCHOOLS[domain]) {
                 const school = SCHOOLS[domain];
@@ -286,9 +305,9 @@
         }
 
         function sendCode() {
-            const email = document.getElementById('email').value;
+            const email = getFullEmail();
             if (!email) {
-                alert('Please enter your school email first.');
+                alert('Please enter your username and select a school domain.');
                 return;
             }
             
@@ -315,30 +334,38 @@
                     clearInterval(countdownTimer);
                     btn.disabled = false;
                     btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    btn.innerText = 'Resend Code';
+                    btn.innerText = 'Send Code';
                 }
             }, 1000);
         }
 
         function handleSubmit(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value;
+            const email = getFullEmail();
             const password = document.getElementById('password').value;
             
+            if (!email) {
+                alert('Please complete the email fields.');
+                return;
+            }
+            
             // Basic Validation
-            const domain = email.split('@')[1];
+            const domain = document.getElementById('email-domain').value;
             // In a real app, you'd check against a database of allowed domains
             // For this demo, we just check if it matches one of our mock schools OR is a valid format
             
             if (isLoginMode) {
                 console.log('Logging in with:', email, password);
-                alert('Login Request Submitted!');
+                alert('Login Request Submitted for ' + email);
             } else {
                 const code = document.getElementById('verify-code').value;
                 console.log('Registering with:', email, password, code);
-                alert('Registration Request Submitted!');
+                alert('Registration Request Submitted for ' + email);
             }
         }
+
+        // Run Init
+        initDropdown();
     </script>
 </body>
 </html>
