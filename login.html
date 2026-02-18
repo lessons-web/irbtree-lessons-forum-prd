@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F7EDD7;
+        }
+        .mustard-btn {
+            background-color: #F5B76A;
+        }
+        .mustard-btn:hover {
+            background-color: #e0a65e;
+        }
+        /* Abstract background shapes */
+        .bg-shape {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        beige: '#F7EDD7',
+                        mustard: '#F5B76A',
+                        charcoal: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-screen w-full relative overflow-hidden flex flex-col justify-between">
+
+    <!-- Background Illustrations (Simplified CSS approximations) -->
+    <div class="absolute top-20 left-20 opacity-60">
+        <svg width="100" height="50" viewBox="0 0 100 50" fill="none" stroke="black" stroke-width="1">
+            <path d="M10 25 Q 25 10, 40 25 T 70 25 T 100 25" />
+        </svg>
+    </div>
+    <div class="absolute bottom-20 right-20 opacity-60">
+        <div class="w-24 h-32 bg-[#F5B76A] rounded-lg relative overflow-hidden">
+            <div class="absolute inset-0 flex flex-wrap gap-2 p-2">
+                <div class="w-1 h-1 bg-black rounded-full"></div>
+                <div class="w-1 h-1 bg-black rounded-full"></div>
+                <div class="w-1 h-1 bg-black rounded-full"></div>
+                <!-- random dots pattern -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header class="relative z-10 flex justify-between items-center p-8">
+        <div>
+            <h1 class="text-3xl font-bold text-[#1a1a1a]" id="school-name-header">IRBTree Lessons Forum</h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 flex items-center justify-center p-4">
+        
+        <!-- Illustration Left (Hidden on mobile) -->
+        <div class="hidden lg:block absolute left-1/4 transform -translate-x-1/2">
+             <div class="border border-gray-400 p-4 w-40 h-32 bg-transparent flex flex-col justify-center gap-2">
+                <div class="h-1 w-24 bg-gray-300 rounded"></div>
+                <div class="h-1 w-16 bg-gray-300 rounded"></div>
+             </div>
+        </div>
+
+        <!-- Login/Register Card -->
+        <div class="bg-white rounded-[2rem] shadow-xl w-full max-w-md p-10 relative z-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-[#1a1a1a] mb-2" id="form-title">Agent Login</h2>
+                <p class="text-gray-500 text-sm" id="form-subtitle">Hey, Enter your details to get sign in to your account</p>
+                <div id="school-badge" class="mt-4 hidden">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                        <i class="fa-solid fa-university"></i>
+                        <span id="school-name-badge">School Name</span>
+                    </span>
+                </div>
+            </div>
+
+            <form id="auth-form" onsubmit="handleSubmit(event)">
+                <!-- Email Field -->
+                <div class="mb-4 relative">
+                    <input type="email" id="email" required
+                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                        placeholder="Enter School Email"
+                        onkeyup="checkSchoolDomain()">
+                    <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                        <i class="fa-regular fa-envelope"></i>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4 relative">
+                    <input type="password" id="password" required
+                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                        placeholder="Passcode">
+                    <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs font-medium text-gray-500 hover:text-black">
+                        Hide
+                    </button>
+                </div>
+
+                <!-- Verification Code Field (Hidden by default) -->
+                <div id="verify-container" class="mb-4 relative hidden">
+                    <div class="flex gap-2">
+                        <input type="text" id="verify-code" 
+                            class="flex-1 px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                            placeholder="Verification Code">
+                        <button type="button" id="send-code-btn" onclick="sendCode()"
+                            class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-medium hover:bg-gray-200 transition-colors whitespace-nowrap min-w-[100px]">
+                            Send Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" class="w-full mustard-btn py-3.5 rounded-xl text-[#1a1a1a] font-semibold text-sm shadow-sm transition-transform active:scale-[0.98]">
+                    Sign in
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="my-8 flex items-center gap-4">
+                <div class="h-[1px] bg-gray-200 flex-1"></div>
+                <span class="text-xs text-gray-400 font-medium whitespace-nowrap">— Or Sign in with —</span>
+                <div class="h-[1px] bg-gray-200 flex-1"></div>
+            </div>
+
+            <!-- Social Buttons -->
+            <div class="flex gap-3 justify-center">
+                <button onclick="alert('暂未开通此功能，请使用学校邮箱进行注册')" class="flex-1 flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fa-brands fa-google text-lg"></i>
+                    <span class="text-xs font-medium">Google</span>
+                </button>
+                <button onclick="alert('暂未开通此功能，请使用学校邮箱进行注册')" class="flex-1 flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fa-brands fa-weixin text-green-600 text-lg"></i>
+                    <span class="text-xs font-medium">WeChat</span>
+                </button>
+            </div>
+
+            <!-- Footer Link -->
+            <div class="mt-8 text-center">
+                <p class="text-xs text-gray-500">
+                    <span id="switch-text">Don't have an account?</span> 
+                    <button onclick="toggleMode()" class="font-bold text-[#1a1a1a] hover:underline ml-1" id="switch-btn">Sign Up</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- Illustration Right (Hidden on mobile) -->
+        <div class="hidden lg:block absolute right-1/4 transform translate-x-1/2">
+            <div class="relative">
+                <!-- Person illustration placeholder -->
+                <svg width="200" height="200" viewBox="0 0 200 200" fill="none">
+                    <circle cx="100" cy="50" r="20" fill="black"/>
+                    <path d="M100 70 L 100 120 L 130 150" stroke="black" stroke-width="2"/>
+                    <path d="M100 120 L 70 150" stroke="black" stroke-width="2"/>
+                    <path d="M80 90 L 120 90" stroke="black" stroke-width="2"/>
+                </svg>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 p-6 text-center">
+        <p class="text-xs text-gray-500">Copyright @wework 2022 | Privacy Policy</p>
+    </footer>
+
+    <script>
+        // Configuration & Mock Data
+        const SCHOOLS = {
+					'ad.unsw.edu.au': {
+						name: 'UNSW Sydney',
+						color: '#FFE600', // UNSW Yellow
+						welcome: 'Welcome back, UNSW Student!'
+					},
+					'sydney.edu.au': {
+						name: 'University of Sydney',
+						color: '#E14532', // USYD Red approximation
+						welcome: 'Welcome, USYD Scholar!'
+					},
+					'monash.edu': {
+						name: 'Monash University',
+						color: '#006DAE',
+						welcome: 'Hello Monash!'
+					},
+					'student.unimelb.edu.au': {
+						name: 'University of Melbourne',
+						color: '#094183',
+						welcome: 'Greetings from Melbourne U'
+					}
+        };
+
+        // State
+        let isLoginMode = true;
+        let countdownTimer = null;
+
+        // Elements
+        const formTitle = document.getElementById('form-title');
+        const formSubtitle = document.getElementById('form-subtitle');
+        const submitBtn = document.getElementById('submit-btn');
+        const switchText = document.getElementById('switch-text');
+        const switchBtn = document.getElementById('switch-btn');
+        const toggleTextBtn = document.getElementById('toggle-text-btn');
+        const verifyContainer = document.getElementById('verify-container');
+        const verifyInput = document.getElementById('verify-code');
+        const schoolBadge = document.getElementById('school-badge');
+        const schoolNameBadge = document.getElementById('school-name-badge');
+        const schoolNameHeader = document.getElementById('school-name-header');
+        
+        // Functions
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            
+            // Update UI Text
+            if (isLoginMode) {
+                formTitle.innerText = 'Agent Login';
+                formSubtitle.innerText = 'Hey, Enter your details to get sign in to your account';
+                submitBtn.innerText = 'Sign in';
+                switchText.innerText = "Don't have an account?";
+                switchBtn.innerText = 'Sign up';
+                if (toggleTextBtn) toggleTextBtn.innerText = 'Sign up';
+                
+                // Hide Verify Code
+                verifyContainer.classList.add('hidden');
+                verifyInput.required = false;
+            } else {
+                formTitle.innerText = 'Create Account';
+                formSubtitle.innerText = 'Join your school community today';
+                submitBtn.innerText = 'Register';
+                switchText.innerText = "Already have an account?";
+                switchBtn.innerText = 'Sign in';
+                if (toggleTextBtn) toggleTextBtn.innerText = 'Sign in';
+                
+                // Show Verify Code
+                verifyContainer.classList.remove('hidden');
+                verifyInput.required = true;
+            }
+        }
+
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const btn = event.currentTarget;
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                btn.innerText = 'Show';
+            } else {
+                pwdInput.type = 'password';
+                btn.innerText = 'Hide';
+            }
+        }
+
+        function checkSchoolDomain() {
+            const email = document.getElementById('email').value;
+            const domain = email.split('@')[1];
+
+            if (domain && SCHOOLS[domain]) {
+                const school = SCHOOLS[domain];
+                
+                // Update UI with School Info
+                schoolBadge.classList.remove('hidden');
+                schoolNameBadge.innerText = school.name;
+                
+                // Update welcome message if in login mode
+                if (isLoginMode) {
+                    formSubtitle.innerText = school.welcome;
+                }
+            } else {
+                schoolBadge.classList.add('hidden');
+                schoolNameHeader.innerText = 'IRBTree Lessons Forum'; // Reset
+                if (isLoginMode) {
+                    formSubtitle.innerText = 'Hey, Enter your details to get sign in to your account';
+                }
+            }
+        }
+
+        function sendCode() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter your school email first.');
+                return;
+            }
+            
+            // Check if it's a valid school email (optional validation step)
+            // For now, we simulate sending
+            
+            const btn = document.getElementById('send-code-btn');
+            if (btn.disabled) return;
+
+            // Start Countdown
+            let timeLeft = 60;
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            alert(`Verification code sent to ${email}`);
+
+            btn.innerText = `${timeLeft}s`;
+            
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                btn.innerText = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.innerText = 'Resend Code';
+                }
+            }, 1000);
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Basic Validation
+            const domain = email.split('@')[1];
+            // In a real app, you'd check against a database of allowed domains
+            // For this demo, we just check if it matches one of our mock schools OR is a valid format
+            
+            if (isLoginMode) {
+                console.log('Logging in with:', email, password);
+                alert('Login Request Submitted!');
+            } else {
+                const code = document.getElementById('verify-code').value;
+                console.log('Registering with:', email, password, code);
+                alert('Registration Request Submitted!');
+            }
+        }
+    </script>
+</body>
+</html>
