@@ -136,40 +136,43 @@
                     </div>
                 </div>
 
+                <!-- School Selection (Common for both) -->
+                <div class="mb-4 relative">
+                    <select id="school-select" 
+                       class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white"
+                       onchange="onSchoolSelect()">
+                       <option value="" disabled selected>请选择学校</option>
+                   </select>
+                   <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                       <i class="fa-solid fa-chevron-down text-xs"></i>
+                   </div>
+               </div>
+
                 <!-- Email Field -->
                 <div class="mb-4">
                     <!-- Student Email Input -->
-                    <div id="student-email-group" class="relative flex items-center gap-2">
-                        <input type="text" id="email-username" 
-                            class="w-[170px] px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
-                            placeholder="学校邮箱前缀">
-                        <span class="text-gray-500 font-bold">@</span>
-                        <select id="email-domain" 
-                            class="flex-1 min-w-0 px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white"
-                            onchange="checkSchoolDomain()">
-                            <option value="" disabled selected>选择学校</option>
-                        </select>
+                    <div id="student-email-group" class="relative">
+                        <div id="email-input-container" class="relative flex items-center gap-2 hidden">
+                            <input type="text" id="email-username" 
+                                class="w-[170px] px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                                placeholder="学号/用户名">
+                            <span class="text-gray-500 font-bold">@</span>
+                            <select id="email-domain" 
+                                class="flex-1 min-w-0 px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white">
+                                <option value="" disabled selected>选择邮箱后缀</option>
+                            </select>
+                        </div>
+                        <p id="student-hint" class="text-xs text-gray-400 mt-2 text-center">请先选择学校以显示邮箱后缀</p>
                     </div>
 
                     <!-- Alumni Email Input -->
-                    <div id="alumni-email-group" class="relative hidden flex-col gap-4">
+                    <div id="alumni-email-group" class="relative hidden">
                         <div class="relative">
                             <input type="email" id="email-full" 
                                 class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
                                 placeholder="请输入您的邮箱地址">
                             <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
                                 <i class="fa-regular fa-envelope"></i>
-                            </div>
-                        </div>
-                        
-                        <!-- School Selection for Alumni (Only visible in Register mode) -->
-                        <div id="alumni-school-select" class="relative hidden">
-                            <select id="alumni-school" 
-                                class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white text-gray-700">
-                                <option value="" disabled selected>请选择您的毕业院校</option>
-                            </select>
-                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
-                                <i class="fa-solid fa-chevron-down text-xs"></i>
                             </div>
                         </div>
                     </div>
@@ -196,6 +199,11 @@
                             Send Code
                         </button>
                     </div>
+                </div>
+
+                <!-- Forgot Password Link (Visible only in Login) -->
+                <div id="forgot-password-link" class="mb-6 flex justify-end">
+                    <a href="#" class="text-xs text-gray-500 hover:text-[#4F46E5] font-medium">Forgot Password?</a>
                 </div>
 
                 <!-- Submit Button -->
@@ -262,27 +270,31 @@
     <script>
         // Configuration & Mock Data
         const SCHOOLS = {
-            'ad.unsw.edu.au': {
+            'UNSW': {
                 name: 'UNSW Sydney',
                 displayName: '新南威尔士大学 (UNSW)',
+                domains: ['ad.unsw.edu.au', 'student.unsw.edu.au', 'zmail.unsw.edu.au'],
                 color: '#FFE600', // UNSW Yellow
                 welcome: 'Welcome back, UNSW Student!'
             },
-            'sydney.edu.au': {
+            'USYD': {
                 name: 'University of Sydney',
                 displayName: '悉尼大学 (USYD)',
+                domains: ['sydney.edu.au', 'uni.sydney.edu.au'],
                 color: '#E14532', // USYD Red approximation
                 welcome: 'Welcome, USYD Scholar!'
             },
-            'monash.edu': {
+            'Monash': {
                 name: 'Monash University',
                 displayName: '莫纳什大学 (Monash)',
+                domains: ['monash.edu', 'student.monash.edu'],
                 color: '#006DAE',
                 welcome: 'Hello Monash!'
             },
-            'student.unimelb.edu.au': {
+            'UniMelb': {
                 name: 'University of Melbourne',
                 displayName: '墨尔本大学 (UniMelb)',
+                domains: ['student.unimelb.edu.au', 'unimelb.edu.au'],
                 color: '#094183',
                 welcome: 'Greetings from Melbourne U'
             }
@@ -308,30 +320,62 @@
         
         // Initialize Dropdown
         function initDropdown() {
-            // Student Email Domain Dropdown
-            const select = document.getElementById('email-domain');
-            select.innerHTML = '<option value="" disabled selected>选择学校</option>';
+            // Global School Selection
+            const schoolSelect = document.getElementById('school-select');
+            schoolSelect.innerHTML = '<option value="" disabled selected>请选择学校</option>';
             
-            // Alumni School Selection Dropdown
-            const alumniSelect = document.getElementById('alumni-school');
-            alumniSelect.innerHTML = '<option value="" disabled selected>请选择您的毕业院校</option>';
-
-            for (const domain in SCHOOLS) {
-                // Populate Student Dropdown
-                const option = document.createElement('option');
-                option.value = domain;
-                option.innerText = SCHOOLS[domain].displayName || domain; // Use displayName if available
-                select.appendChild(option);
+            for (const key in SCHOOLS) {
+                const school = SCHOOLS[key];
                 
-                // Populate Alumni Dropdown
-                const alumniOption = document.createElement('option');
-                alumniOption.value = domain; // Or use a school ID if you had one
-                alumniOption.innerText = SCHOOLS[domain].displayName || SCHOOLS[domain].name;
-                alumniSelect.appendChild(alumniOption);
+                // Populate Global School Dropdown
+                const option = document.createElement('option');
+                option.value = key;
+                option.innerText = school.displayName;
+                schoolSelect.appendChild(option);
             }
         }
 
         // Functions
+        function onSchoolSelect() {
+            const schoolKey = document.getElementById('school-select').value;
+            const school = SCHOOLS[schoolKey];
+            const emailContainer = document.getElementById('email-input-container');
+            const domainSelect = document.getElementById('email-domain');
+            const studentHint = document.getElementById('student-hint');
+            
+            if (school) {
+                // Update UI Theme
+                updateSchoolTheme(school);
+                
+                // Populate Email Domains (for Students)
+                domainSelect.innerHTML = ''; 
+                school.domains.forEach(domain => {
+                    const option = document.createElement('option');
+                    option.value = domain;
+                    option.innerText = '@' + domain;
+                    domainSelect.appendChild(option);
+                });
+                
+                // Show Email Input for Students
+                if (emailContainer) {
+                    emailContainer.classList.remove('hidden');
+                    emailContainer.classList.add('flex');
+                }
+                if (studentHint) studentHint.classList.add('hidden');
+            }
+        }
+
+        function updateSchoolTheme(school) {
+            // Update UI with School Info
+            schoolBadge.classList.remove('hidden');
+            schoolNameBadge.innerText = school.name;
+            
+            // Update welcome message if in login mode
+            if (isLoginMode) {
+                formSubtitle.innerText = school.welcome;
+            }
+        }
+
         function toggleUserType() {
             const radios = document.getElementsByName('userType');
             let selectedType;
@@ -346,38 +390,24 @@
             
             const studentGroup = document.getElementById('student-email-group');
             const alumniGroup = document.getElementById('alumni-email-group');
-            const alumniSchoolSelect = document.getElementById('alumni-school-select');
             
             if (isStudentMode) {
                 studentGroup.classList.remove('hidden');
-                studentGroup.classList.add('flex');
                 alumniGroup.classList.add('hidden');
-                alumniGroup.classList.remove('flex');
-                checkSchoolDomain(); // Restore badge if needed
             } else {
                 studentGroup.classList.add('hidden');
-                studentGroup.classList.remove('flex');
                 alumniGroup.classList.remove('hidden');
-                alumniGroup.classList.add('flex');
-                // Hide school badge for alumni
-                schoolBadge.classList.add('hidden');
-                if (isLoginMode) {
-                    formSubtitle.innerText = 'Hey, Enter your details to sign in to your account';
-                }
-                
-                // Check if we need to show alumni school select (only in register mode)
-                if (!isLoginMode) {
-                    alumniSchoolSelect.classList.remove('hidden');
-                } else {
-                    alumniSchoolSelect.classList.add('hidden');
-                }
             }
+            
+            // Note: We don't hide school badge anymore as school select is global
+            // But we might want to update welcome text logic if needed
         }
 
         function toggleMode() {
             isLoginMode = !isLoginMode;
             
             const alumniSchoolSelect = document.getElementById('alumni-school-select');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
 
             // Update UI Text
             if (isLoginMode) {
@@ -392,11 +422,17 @@
                 verifyContainer.classList.add('hidden');
                 verifyInput.required = false;
                 
+                // Show Forgot Password
+                if (forgotPasswordLink) forgotPasswordLink.classList.remove('hidden');
+                
                 // Hide Alumni School Select in Login Mode
                 if (alumniSchoolSelect) alumniSchoolSelect.classList.add('hidden');
                 
-                // Re-check domain to update subtitle if in student mode
-                if (isStudentMode) checkSchoolDomain();
+                // Restore theme if school is selected
+                const schoolKey = document.getElementById('school-select').value;
+                if (schoolKey && SCHOOLS[schoolKey]) {
+                    updateSchoolTheme(SCHOOLS[schoolKey]);
+                }
                 
             } else {
                 formTitle.innerText = 'Create Account';
@@ -409,6 +445,9 @@
                 // Show Verify Code
                 verifyContainer.classList.remove('hidden');
                 verifyInput.required = true;
+                
+                // Hide Forgot Password
+                if (forgotPasswordLink) forgotPasswordLink.classList.add('hidden');
                 
                 // Show Alumni School Select in Register Mode (if Alumni)
                 if (!isStudentMode && alumniSchoolSelect) {
@@ -437,29 +476,6 @@
                 return `${username}@${domain}`;
             } else {
                 return document.getElementById('email-full').value;
-            }
-        }
-
-        function checkSchoolDomain() {
-            const domain = document.getElementById('email-domain').value;
-
-            if (domain && SCHOOLS[domain]) {
-                const school = SCHOOLS[domain];
-                
-                // Update UI with School Info
-                schoolBadge.classList.remove('hidden');
-                schoolNameBadge.innerText = school.name;
-                
-                // Update welcome message if in login mode
-                if (isLoginMode) {
-                    formSubtitle.innerText = school.welcome;
-                }
-            } else {
-                schoolBadge.classList.add('hidden');
-                schoolNameHeader.innerText = 'IRBTree Lessons Forum'; // Reset
-                if (isLoginMode) {
-                    formSubtitle.innerText = 'Hey, Enter your details to get sign in to your account';
-                }
             }
         }
 
@@ -500,6 +516,14 @@
 
         function handleSubmit(e) {
             e.preventDefault();
+            
+            // Global School Validation
+            const schoolKey = document.getElementById('school-select').value;
+            if (!schoolKey || !SCHOOLS[schoolKey]) {
+                alert('Please select your university.');
+                return;
+            }
+            
             const email = getFullEmail();
             const password = document.getElementById('password').value;
             
@@ -508,18 +532,13 @@
                 return;
             }
             
-            // Basic Validation
-            const domain = document.getElementById('email-domain').value;
-            // In a real app, you'd check against a database of allowed domains
-            // For this demo, we just check if it matches one of our mock schools OR is a valid format
-            
             if (isLoginMode) {
                 console.log('Logging in with:', email, password);
-                alert('Login Request Submitted for ' + email);
+                alert('Login Request Submitted for ' + email + ` (at ${SCHOOLS[schoolKey].name})`);
             } else {
                 const code = document.getElementById('verify-code').value;
-                console.log('Registering with:', email, password, code);
-                alert('Registration Request Submitted for ' + email);
+                console.log('Registering with:', email, password, code, schoolKey);
+                alert('Registration Request Submitted for ' + email + ` (at ${SCHOOLS[schoolKey].name})`);
             }
         }
 
