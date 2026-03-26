@@ -179,7 +179,13 @@
 					<nav class="hidden h-16 md:flex space-x-8">
 						<a href="#" onclick="switchTab(event, 'home')" id="nav-home" class="nav-item h-16 flex items-center text-primary font-medium border-b-4 border-primary px-1 pt-1 transition">首页</a>
 						<a href="#" onclick="switchTab(event, 'courses')" id="nav-courses" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">课程列表</a>
-						<a href="#" onclick="switchTab(event, 'review')" id="nav-review" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">写点评</a>
+						<!-- <a href="#" onclick="switchTab(event, 'review')" id="nav-review" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition">写点评</a> -->
+						<a href="#" onclick="switchTab(event, 'recommendation')" id="nav-recommendation" class="nav-item h-16 flex items-center text-gray-500 hover:text-gray-900 hover:border-gray-300 border-b-4 border-transparent px-1 pt-1 transition relative">
+							选课推荐
+							<div class="absolute -right-4 text-yellow-400 animate-bounce">
+								<i class="ph-fill ph-sparkle text-sm"></i>
+							</div>
+						</a>
 					</nav>
 
 					<!-- Auth Buttons -->
@@ -858,6 +864,163 @@
 				</div>
 			</div>
 
+			<!-- Recommendation View -->
+			<div id="view-recommendation" class="tab-content hidden">
+				<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+					<div class="flex items-center justify-between mb-8">
+						<h1 class="text-3xl font-bold text-gray-900">选课推荐</h1>
+						<button onclick="openCourseHistoryModal()" class="text-primary hover:text-secondary flex items-center font-medium bg-indigo-50 px-4 py-2 rounded-lg transition">
+							<i class="ph-bold ph-clock-counter-clockwise mr-2"></i> 管理已修课程
+						</button>
+					</div>
+
+					<!-- Step 1: Term Selection -->
+					<div id="rec-step-1" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6 transition-all duration-300">
+						<h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center">
+							<span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3">1</span>
+							选择排课学期
+						</h2>
+						<div class="max-w-xs">
+							<label class="block text-sm font-medium text-gray-700 mb-2">目标学期</label>
+							<select id="rec-term-select" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block p-3">
+								<option value="2024T2" selected>2024 T2</option>
+								<option value="2024T3">2024 T3</option>
+								<option value="2025T1">2025 T1</option>
+							</select>
+						</div>
+						<div class="mt-8 flex justify-end">
+							<button onclick="goToRecStep(2)" class="bg-primary hover:bg-secondary text-white px-6 py-2.5 rounded-lg font-medium transition shadow-sm">
+								下一步
+							</button>
+						</div>
+					</div>
+
+					<!-- Step 2: Recommendation Process -->
+					<div id="rec-step-2" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6 hidden transition-all duration-300">
+						<div class="flex items-center justify-between mb-6">
+							<h2 class="text-xl font-bold text-gray-900 flex items-center">
+								<span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3">2</span>
+								生成推荐课程
+							</h2>
+							<button onclick="goToRecStep(1)" class="text-gray-500 hover:text-gray-900 text-sm flex items-center transition">
+								<i class="ph-bold ph-arrow-left mr-1"></i> 返回上一步
+							</button>
+						</div>
+
+						<!-- Tabs for Rule vs AI -->
+						<div class="border-b border-gray-200 mb-6">
+							<nav class="-mb-px flex space-x-8" aria-label="Tabs">
+								<button onclick="switchRecEngine('rule')" id="rec-tab-rule" class="border-primary text-primary whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition">
+									<i class="ph-bold ph-funnel mr-2 text-lg"></i> 规则式选课
+								</button>
+								<button onclick="switchRecEngine('ai')" id="rec-tab-ai" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition">
+									<i class="ph-bold ph-magic-wand mr-2 text-lg"></i> AI 大模型选课
+								</button>
+							</nav>
+						</div>
+
+						<!-- Rule Engine -->
+						<div id="rec-engine-rule" class="block">
+							<p class="text-sm text-gray-500 mb-4">根据您的偏好条件，从论坛海量数据中筛选出最适合您的课程。</p>
+							<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+								<label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition group">
+									<input type="checkbox" class="rec-rule-checkbox w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" value="high_pass">
+									<span class="ml-3">
+										<span class="block text-sm font-medium text-gray-900 group-hover:text-primary transition">好通过考试</span>
+										<span class="block text-xs text-gray-500 mt-0.5">通过率>85%</span>
+									</span>
+								</label>
+								<label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition group">
+									<input type="checkbox" class="rec-rule-checkbox w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" value="useful">
+									<span class="ml-3">
+										<span class="block text-sm font-medium text-gray-900 group-hover:text-primary transition">能学到知识</span>
+										<span class="block text-xs text-gray-500 mt-0.5">实用性评分>4.2</span>
+									</span>
+								</label>
+								<label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition group">
+									<input type="checkbox" class="rec-rule-checkbox w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary" value="easy">
+									<span class="ml-3">
+										<span class="block text-sm font-medium text-gray-900 group-hover:text-primary transition">水课/事少</span>
+										<span class="block text-xs text-gray-500 mt-0.5">作业少/无Final</span>
+									</span>
+								</label>
+								<label class="relative flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition group">
+									<input type="checkbox" class="rec-rule-checkbox w-4 innerHTML text-primary border-gray-300 rounded focus:ring-primary" value="high_score">
+									<span class="ml-3">
+										<span class="block text-sm font-medium text-gray-900 group-hover:text-primary transition">高分好评</span>
+										<span class="block text-xs text-gray-500 mt-0.5">综合评分>4.5</span>
+									</span>
+								</label>
+							</div>
+							<button onclick="generateRecList('rule')" id="btn-generate-rule" class="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-xl font-medium transition shadow-sm flex items-center justify-center">
+								<i class="ph-bold ph-sparkle mr-2"></i> 生成推荐清单
+							</button>
+						</div>
+
+						<!-- AI Engine -->
+						<div id="rec-engine-ai" class="hidden">
+							<p class="text-sm text-gray-500 mb-4">告诉 AI 您的具体诉求，它会结合您的历史选课与论坛数据为您量身定制。</p>
+							<div class="mb-4">
+								<textarea id="rec-ai-prompt" rows="4" class="block w-full p-4 text-gray-900 border border-gray-300 rounded-xl bg-gray-50 focus:ring-primary focus:border-primary transition resize-none" placeholder="例如：我下学期想找实习，希望课少一点，最好是没有期末考试的课，同时我计划毕业后找一份全栈开发的工作，所以想学一些关于前后端开发的知识..."></textarea>
+							</div>
+							<button onclick="generateRecList('ai')" id="btn-generate-ai" class="w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 hover:from-indigo-600 hover:via-purple-600 hover:to-pink-600 text-white py-3 rounded-xl font-medium transition shadow-md flex items-center justify-center">
+								<i class="ph-bold ph-magic-wand mr-2"></i> AI 智能生成
+							</button>
+						</div>
+
+						<!-- Results Area (Hidden initially) -->
+						<div id="rec-results-area" class="mt-8 hidden border-t border-gray-100 pt-8">
+							<h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center justify-between">
+								<span>推荐课程清单</span>
+								<span class="text-sm font-normal text-gray-500" id="rec-results-count">共找到 0 门课程</span>
+							</h3>
+							
+							<div id="rec-results-list" class="space-y-4 mb-8">
+								<!-- Populated by JS -->
+							</div>
+
+							<div class="flex justify-end">
+								<button onclick="goToRecStep(3)" id="btn-to-step3" class="bg-primary hover:bg-secondary text-white px-6 py-2.5 rounded-lg font-medium transition shadow-sm opacity-50 cursor-not-allowed" disabled>
+									确认选课，进入下一步
+								</button>
+							</div>
+						</div>
+					</div>
+
+					<!-- Step 3: Confirmation -->
+					<div id="rec-step-3" class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6 hidden transition-all duration-300">
+						<div class="flex items-center justify-between mb-6">
+							<h2 class="text-xl font-bold text-gray-900 flex items-center">
+								<span class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm mr-3">3</span>
+								选课确认与保存
+							</h2>
+							<button onclick="goToRecStep(2)" class="text-gray-500 hover:text-gray-900 text-sm flex items-center transition">
+								<i class="ph-bold ph-arrow-left mr-1"></i> 返回上一步
+							</button>
+						</div>
+
+						<div class="bg-indigo-50 rounded-xl p-6 mb-8 border border-indigo-100">
+							<div class="flex items-center justify-between mb-4">
+								<h3 class="font-bold text-gray-900 text-lg" id="rec-confirm-term">2024 T2 选课计划</h3>
+								<div class="flex items-center space-x-4 text-sm">
+									<span class="text-gray-600">总学分: <strong class="text-primary text-lg" id="rec-confirm-credits">0</strong> UOC</span>
+								</div>
+							</div>
+							
+							<div id="rec-confirm-list" class="space-y-3">
+								<!-- Final confirmed courses -->
+							</div>
+						</div>
+
+						<div class="flex justify-end space-x-4">
+							<button onclick="saveRecPlan()" class="bg-primary hover:bg-secondary text-white px-8 py-3 rounded-xl font-bold transition shadow-md flex items-center">
+								<i class="ph-bold ph-floppy-disk mr-2"></i> 保存并生成计划
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
 			<!-- Floating Mini Program Entry Button -->
 			<button onclick="window.open('miniprogram.html', '_blank')" class="fixed bottom-24 right-8 z-[100] bg-gray-900 text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-transform duration-300 group" style="display: flex !important;" title="打开小程序原型">
 				<i class="ph-bold ph-device-mobile text-2xl group-hover:animate-pulse"></i>
@@ -926,6 +1089,50 @@
 
             <div class="mt-6 text-center">
                 <p class="text-xs text-gray-400">默认账号已预填，直接点击登录即可体验。</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course History Modal -->
+    <div id="courseHistoryModal" class="fixed inset-0 z-50 flex items-center justify-center hidden-modal">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900 bg-opacity-50 backdrop-blur-sm" onclick="closeCourseHistoryModal()"></div>
+        
+        <!-- Modal Content -->
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-8 relative z-10 transform transition-all scale-100 flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-6 shrink-0">
+                <h2 class="text-2xl font-bold text-gray-900">管理已修课程</h2>
+                <button onclick="closeCourseHistoryModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="ph-bold ph-x text-xl"></i>
+                </button>
+            </div>
+
+            <div class="mb-6 shrink-0">
+                <p class="text-sm text-gray-500 mb-4">添加您已经修过的课程，系统在推荐时将自动为您过滤这些课程，并将其作为AI推荐的先修课推导依据。</p>
+                <div class="relative">
+                    <input type="text" id="history-course-search" class="block w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-primary focus:border-primary transition" placeholder="输入课程代码或名称搜索..." oninput="handleHistorySearch(this.value)">
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="ph ph-magnifying-glass text-gray-400"></i>
+                    </div>
+                    <!-- Dropdown for search results -->
+                    <div id="history-search-dropdown" class="absolute z-10 w-full mt-1 bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm hidden">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex-grow overflow-y-auto min-h-[200px] border border-gray-200 rounded-xl p-4 bg-gray-50">
+                <h3 class="text-sm font-medium text-gray-700 mb-3">已添加的课程</h3>
+                <div id="history-courses-list" class="flex flex-wrap gap-2">
+                    <!-- Populated by JS -->
+                    <div class="text-sm text-gray-400 italic" id="history-empty-state">暂无已修课程</div>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end shrink-0">
+                <button onclick="closeCourseHistoryModal()" class="bg-primary hover:bg-secondary text-white px-6 py-2.5 rounded-lg font-medium transition shadow-sm">
+                    完成
+                </button>
             </div>
         </div>
     </div>
@@ -2527,6 +2734,249 @@
         function markAllNotificationsRead() {
             mockNotifications.forEach(n => n.read = true);
             renderNotifications();
+        }
+
+        // ================= Recommendation Logic =================
+        let recHistoryCourses = [];
+        let recSelectedCourses = []; // Final confirmed courses
+        let recGeneratedList = []; // The generated list from Rule/AI
+
+        function goToRecStep(step) {
+            if (step === 1) {
+                document.getElementById('rec-step-1').classList.remove('hidden');
+                document.getElementById('rec-step-2').classList.add('hidden');
+                document.getElementById('rec-step-3').classList.add('hidden');
+            } else if (step === 2) {
+                document.getElementById('rec-step-1').classList.add('hidden');
+                document.getElementById('rec-step-2').classList.remove('hidden');
+                document.getElementById('rec-step-3').classList.add('hidden');
+            } else if (step === 3) {
+                // Populate Step 3 Confirmation
+                const selected = recGeneratedList.filter(c => c.selected);
+                if (selected.length === 0) {
+                    alert('请至少选择一门课程');
+                    return;
+                }
+                
+                const term = document.getElementById('rec-term-select').value;
+                document.getElementById('rec-confirm-term').innerText = term + ' 选课计划';
+                
+                let totalCredits = 0;
+                document.getElementById('rec-confirm-list').innerHTML = selected.map(c => {
+                    totalCredits += parseInt(c.credits) || 6;
+                    return `
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg border border-indigo-50">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-primary font-bold mr-3">
+                                ${c.code.substring(0, 4)}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-900">${c.code}</h4>
+                                <p class="text-xs text-gray-500">${c.name}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-medium text-gray-900">${c.credits || 6} UOC</span>
+                        </div>
+                    </div>`;
+                }).join('');
+                
+                document.getElementById('rec-confirm-credits').innerText = totalCredits;
+
+                document.getElementById('rec-step-1').classList.add('hidden');
+                document.getElementById('rec-step-2').classList.add('hidden');
+                document.getElementById('rec-step-3').classList.remove('hidden');
+            }
+        }
+
+        function switchRecEngine(engine) {
+            const ruleTab = document.getElementById('rec-tab-rule');
+            const aiTab = document.getElementById('rec-tab-ai');
+            const ruleEngine = document.getElementById('rec-engine-rule');
+            const aiEngine = document.getElementById('rec-engine-ai');
+
+            if (engine === 'rule') {
+                ruleTab.className = "border-primary text-primary whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition";
+                aiTab.className = "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition";
+                ruleEngine.classList.remove('hidden');
+                ruleEngine.classList.add('block');
+                aiEngine.classList.remove('block');
+                aiEngine.classList.add('hidden');
+            } else {
+                aiTab.className = "border-primary text-primary whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition";
+                ruleTab.className = "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center transition";
+                aiEngine.classList.remove('hidden');
+                aiEngine.classList.add('block');
+                ruleEngine.classList.remove('block');
+                ruleEngine.classList.add('hidden');
+            }
+            
+            // Hide results area when switching
+            document.getElementById('rec-results-area').classList.add('hidden');
+            document.getElementById('btn-to-step3').disabled = true;
+            document.getElementById('btn-to-step3').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function generateRecList(engine) {
+            const btn = document.getElementById(`btn-generate-${engine}`);
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin mr-2"></i> 生成中...`;
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Mock Generate Data
+                // Filter out history courses
+                const availableCourses = courses.filter(c => !recHistoryCourses.includes(c.code));
+                
+                // Randomly select 3-5 courses
+                const count = Math.floor(Math.random() * 3) + 3;
+                recGeneratedList = [];
+                const shuffled = availableCourses.sort(() => 0.5 - Math.random());
+                for(let i=0; i<count && i<shuffled.length; i++) {
+                    recGeneratedList.push({
+                        ...shuffled[i],
+                        credits: 6,
+                        selected: false,
+                        reason: engine === 'ai' ? '基于您的实习诉求，这门课作业少且无期末考试，完美契合您的需求。' : '符合您勾选的"好通过/水课"条件，历史通过率92%。'
+                    });
+                }
+
+                renderRecResults();
+                
+                document.getElementById('rec-results-area').classList.remove('hidden');
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }, 1500);
+        }
+
+        function renderRecResults() {
+            document.getElementById('rec-results-count').innerText = `共找到 ${recGeneratedList.length} 门课程`;
+            
+            const listContainer = document.getElementById('rec-results-list');
+            listContainer.innerHTML = recGeneratedList.map((c, index) => `
+                <div class="bg-white border ${c.selected ? 'border-primary ring-1 ring-primary' : 'border-gray-200'} rounded-xl p-5 flex items-start gap-4 transition-all cursor-pointer hover:shadow-md" onclick="toggleRecCourse(${index})">
+                    <div class="pt-1">
+                        <div class="w-5 h-5 rounded border ${c.selected ? 'bg-primary border-primary text-white' : 'border-gray-300 bg-white'} flex items-center justify-center transition">
+                            ${c.selected ? '<i class="ph-bold ph-check text-xs"></i>' : ''}
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between mb-1">
+                            <h4 class="text-lg font-bold text-gray-900">${c.code}</h4>
+                            <span class="text-sm font-medium text-gray-600">${c.credits} UOC</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2 truncate">${c.name}</p>
+                        <div class="bg-indigo-50 rounded-lg p-3 text-sm text-indigo-900 flex items-start">
+                            <i class="ph-fill ph-sparkle text-primary mt-0.5 mr-2"></i>
+                            <span>${c.reason}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateRecStep3Button();
+        }
+
+        function toggleRecCourse(index) {
+            recGeneratedList[index].selected = !recGeneratedList[index].selected;
+            renderRecResults();
+        }
+
+        function updateRecStep3Button() {
+            const hasSelected = recGeneratedList.some(c => c.selected);
+            const btn = document.getElementById('btn-to-step3');
+            if (hasSelected) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        function saveRecPlan() {
+            alert('选课计划已保存！可在个人中心查看。');
+            switchTab(new Event('click'), 'profile'); // Switch to profile
+        }
+
+        // ================= History Courses Logic =================
+        function openCourseHistoryModal() {
+            document.getElementById('courseHistoryModal').classList.remove('hidden-modal');
+            document.getElementById('courseHistoryModal').classList.add('visible-modal');
+            renderHistoryCourses();
+        }
+
+        function closeCourseHistoryModal() {
+            document.getElementById('courseHistoryModal').classList.remove('visible-modal');
+            document.getElementById('courseHistoryModal').classList.add('hidden-modal');
+            document.getElementById('history-course-search').value = '';
+            document.getElementById('history-search-dropdown').classList.add('hidden');
+        }
+
+        function handleHistorySearch(query) {
+            const dropdown = document.getElementById('history-search-dropdown');
+            if (!query) {
+                dropdown.classList.add('hidden');
+                return;
+            }
+            
+            const filtered = courses.filter(c => 
+                (c.code.toLowerCase().includes(query.toLowerCase()) || 
+                c.name.toLowerCase().includes(query.toLowerCase())) &&
+                !recHistoryCourses.includes(c.code)
+            ).slice(0, 5); // limit to 5
+
+            if (filtered.length === 0) {
+                dropdown.innerHTML = '<div class="px-4 py-2 text-gray-500 text-sm">未找到未添加的课程</div>';
+            } else {
+                dropdown.innerHTML = filtered.map(c => `
+                    <div class="px-4 py-2 hover:bg-indigo-50 cursor-pointer flex items-center justify-between group transition" onclick="addHistoryCourse('${c.code}')">
+                        <div>
+                            <span class="font-bold text-gray-900 group-hover:text-primary">${c.code}</span>
+                            <span class="text-sm text-gray-500 ml-2 truncate">${c.name}</span>
+                        </div>
+                        <i class="ph-bold ph-plus text-gray-400 group-hover:text-primary"></i>
+                    </div>
+                `).join('');
+            }
+            dropdown.classList.remove('hidden');
+        }
+
+        function addHistoryCourse(code) {
+            if (!recHistoryCourses.includes(code)) {
+                recHistoryCourses.push(code);
+            }
+            document.getElementById('history-course-search').value = '';
+            document.getElementById('history-search-dropdown').classList.add('hidden');
+            renderHistoryCourses();
+        }
+
+        function removeHistoryCourse(code) {
+            recHistoryCourses = recHistoryCourses.filter(c => c !== code);
+            renderHistoryCourses();
+        }
+
+        function renderHistoryCourses() {
+            const list = document.getElementById('history-courses-list');
+            const emptyState = document.getElementById('history-empty-state');
+            
+            if (recHistoryCourses.length === 0) {
+                emptyState.style.display = 'block';
+                list.innerHTML = '';
+                list.appendChild(emptyState);
+            } else {
+                emptyState.style.display = 'none';
+                list.innerHTML = recHistoryCourses.map(code => `
+                    <div class="inline-flex items-center bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm">
+                        ${code}
+                        <button onclick="removeHistoryCourse('${code}')" class="ml-2 text-gray-400 hover:text-red-500 transition focus:outline-none">
+                            <i class="ph-bold ph-x"></i>
+                        </button>
+                    </div>
+                `).join('');
+                list.appendChild(emptyState);
+            }
         }
     </script>
 </body>
