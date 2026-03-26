@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>School Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF5FF;
+        }
+        .mustard-btn {
+            background-color: #4F46E5;
+            color: white !important;
+        }
+        .mustard-btn:hover {
+            background-color: #6366F1;
+        }
+        /* Abstract background shapes */
+        .bg-shape {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        beige: '#FAF5FF',
+                        mustard: '#4F46E5',
+                        charcoal: '#1a1a1a',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-screen w-full relative overflow-hidden flex flex-col justify-between">
+
+    <!-- Background Illustrations (Simplified CSS approximations) -->
+    <div class="absolute top-20 left-20 opacity-60">
+        <!-- Abstract Curve -->
+        <svg width="100" height="50" viewBox="0 0 100 50" fill="none" stroke="black" stroke-width="1">
+            <path d="M10 25 Q 25 10, 40 25 T 70 25 T 100 25" />
+        </svg>
+        <!-- Added Floating Pen -->
+        <div class="absolute top-20 left-10 transform -rotate-12 opacity-50">
+            <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+            </svg>
+        </div>
+    </div>
+    <div class="absolute bottom-20 right-20 opacity-60">
+        <div class="w-24 h-32 bg-[#4F46E5] rounded-lg relative overflow-hidden flex items-center justify-center">
+            <!-- Book Icon inside the purple block -->
+             <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+        </div>
+        <!-- Added Graduation Cap -->
+        <div class="absolute -top-16 -left-10 transform rotate-6 opacity-40">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header class="relative z-10 flex justify-between items-center p-8">
+        <div>
+            <h1 class="text-3xl font-bold text-[#1a1a1a]" id="school-name-header">
+                <span class="relative inline-block p-1">
+                    <span class="relative z-10">IRBTree</span>
+                    <span class="absolute bottom-1 left-0 w-full h-4 bg-gradient-to-t from-[#4F46E5] to-transparent opacity-70 -z-0"></span>
+                </span>
+                Lessons Forum
+            </h1>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="relative z-10 flex-1 flex items-center justify-center p-4">
+        
+        <!-- Illustration Left (Hidden on mobile) -->
+        <div class="hidden lg:block absolute left-1/4 transform -translate-x-1/2">
+             <div class="relative">
+                <!-- Stack of Books -->
+                <svg width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    <!-- Second book on top -->
+                    <path d="M4 14.5A2.5 2.5 0 0 1 6.5 12H20v2.5H6.5a2.5 2.5 0 0 0-2.5 2.5z" transform="translate(0, -5)"></path>
+                </svg>
+                <!-- Floating Chat Bubble -->
+                <div class="absolute -top-5 -right-5 animate-bounce" style="animation-duration: 3s;">
+                    <svg width="50" height="50" viewBox="0 0 24 24" fill="#4F46E5" stroke="none">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                    <span class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white text-xs font-bold">?</span>
+                </div>
+             </div>
+        </div>
+
+        <!-- Login/Register Card -->
+        <div class="bg-white rounded-[2rem] shadow-xl w-full max-w-lg p-10 relative z-20">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-[#1a1a1a] mb-2" id="form-title">Agent Login</h2>
+                <p class="text-gray-500 text-sm" id="form-subtitle">Hey, Enter your details to get sign in to your account</p>
+                <div id="school-badge" class="mt-4 hidden">
+                    <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-semibold">
+                        <i class="fa-solid fa-university"></i>
+                        <span id="school-name-badge">School Name</span>
+                    </span>
+                </div>
+            </div>
+
+            <form id="auth-form" onsubmit="handleSubmit(event)">
+                <!-- User Type Selection -->
+                <div class="w-full flex justify-center mb-6">
+                    <div class="flex w-full bg-gray-100 rounded-xl p-1 border border-gray-200 shadow-inner">
+                        <label class="cursor-pointer flex-1">
+                            <input type="radio" name="userType" value="student" class="peer sr-only" checked onchange="toggleUserType()">
+                            <span class="block w-full text-center px-6 py-2 rounded-lg text-sm font-medium text-gray-500 peer-checked:bg-[#4F46E5] peer-checked:text-white peer-checked:shadow-sm transition-all">在校生</span>
+                        </label>
+                        <label class="cursor-pointer flex-1">
+                            <input type="radio" name="userType" value="alumni" class="peer sr-only" onchange="toggleUserType()">
+                            <span class="block w-full text-center px-6 py-2 rounded-lg text-sm font-medium text-gray-500 peer-checked:bg-[#4F46E5] peer-checked:text-white peer-checked:shadow-sm transition-all">毕业生</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- School Selection (Common for both) -->
+                <div class="mb-4 relative">
+                    <select id="school-select" 
+                       class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white"
+                       onchange="onSchoolSelect()">
+                       <option value="" disabled selected>请选择学校</option>
+                   </select>
+                   <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none">
+                       <i class="fa-solid fa-chevron-down text-xs"></i>
+                   </div>
+               </div>
+
+                <!-- Email Field -->
+                <div class="mb-4">
+                    <!-- Student Email Input -->
+                    <div id="student-email-group" class="relative">
+                        <div id="email-input-container" class="relative flex items-center gap-2 hidden">
+                            <input type="text" id="email-username" 
+                                class="w-[170px] px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                                placeholder="学校邮箱前缀">
+                            <span class="text-gray-500 font-bold">@</span>
+                            <select id="email-domain" 
+                                class="flex-1 min-w-0 px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm bg-white">
+                                <option value="" disabled selected>选择邮箱后缀</option>
+                            </select>
+                        </div>
+                        <p id="student-hint" class="text-xs text-gray-400 mt-2 text-center">请先选择学校以显示邮箱后缀</p>
+                    </div>
+
+                    <!-- Alumni Email Input -->
+                    <div id="alumni-email-group" class="relative hidden">
+                        <div class="relative">
+                            <input type="email" id="email-full" 
+                                class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                                placeholder="请输入您的邮箱地址">
+                            <div class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                <i class="fa-regular fa-envelope"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4 relative">
+                    <input type="password" id="password" required
+                        class="w-full px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                        placeholder="Passcode">
+                    <button type="button" onclick="togglePassword()" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-xs font-medium text-gray-500 hover:text-black">
+                        Hide
+                    </button>
+                </div>
+
+                <!-- Verification Code Field (Hidden by default) -->
+                <div id="verify-container" class="mb-4 relative hidden">
+                    <div class="flex gap-2">
+                        <input type="text" id="verify-code" 
+                            class="flex-1 px-4 py-3.5 border border-gray-200 rounded-xl outline-none focus:border-mustard focus:ring-1 focus:ring-mustard transition-all text-sm"
+                            placeholder="Verification Code">
+                        <button type="button" id="send-code-btn" onclick="sendCode()"
+                            class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-medium hover:bg-gray-200 transition-colors whitespace-nowrap min-w-[100px]">
+                            Send Code
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Forgot Password Link (Visible only in Login) -->
+                <div id="forgot-password-link" class="mb-6 flex justify-end">
+                    <a href="#" class="text-xs text-gray-500 hover:text-[#4F46E5] font-medium">Forgot Password?</a>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submit-btn" class="w-full mustard-btn py-3.5 rounded-xl text-[#1a1a1a] font-semibold text-sm shadow-sm transition-transform active:scale-[0.98]">
+                    Sign in
+                </button>
+            </form>
+
+            <!-- Divider -->
+            <div class="my-8 flex items-center gap-4">
+                <div class="h-[1px] bg-gray-200 flex-1"></div>
+                <span class="text-xs text-gray-400 font-medium whitespace-nowrap">— Or Sign in with —</span>
+                <div class="h-[1px] bg-gray-200 flex-1"></div>
+            </div>
+
+            <!-- Social Buttons -->
+            <div class="flex gap-3 justify-center">
+                <button onclick="alert('暂未开通此功能，请使用学校邮箱进行注册')" class="flex-1 flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fa-brands fa-google text-lg"></i>
+                    <span class="text-xs font-medium">Google</span>
+                </button>
+                <button onclick="alert('暂未开通此功能，请使用学校邮箱进行注册')" class="flex-1 flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-xl hover:bg-gray-50 transition-colors">
+                    <i class="fa-brands fa-weixin text-green-600 text-lg"></i>
+                    <span class="text-xs font-medium">WeChat</span>
+                </button>
+            </div>
+
+            <!-- Footer Link -->
+            <div class="mt-8 text-center">
+                <p class="text-xs text-gray-500">
+                    <span id="switch-text">Don't have an account?</span> 
+                    <button onclick="toggleMode()" class="font-bold text-[#1a1a1a] hover:underline ml-1" id="switch-btn">Sign Up</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- Illustration Right (Hidden on mobile) -->
+        <div class="hidden lg:block absolute right-1/4 transform translate-x-1/2">
+            <div class="relative">
+                <!-- Laptop Icon -->
+                <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                </svg>
+                <!-- Pen floating -->
+                <div class="absolute -bottom-5 -left-10 transform rotate-45 animate-pulse" style="animation-duration: 4s;">
+                     <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#4F46E5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                        <path d="M2 2l7.586 7.586"></path>
+                        <circle cx="11" cy="11" r="2"></circle>
+                     </svg>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 p-6 text-center">
+        <p class="text-xs text-gray-500">Copyright @irbtree 2026 | Luffy's FE Studio</p>
+    </footer>
+
+    <script>
+        // Configuration & Mock Data
+        const SCHOOLS = {
+            'UNSW': {
+                name: 'UNSW Sydney',
+                displayName: '新南威尔士大学 (UNSW)',
+                domains: ['ad.unsw.edu.au', 'student.unsw.edu.au', 'zmail.unsw.edu.au'],
+                color: '#FFE600', // UNSW Yellow
+                welcome: 'Welcome back, UNSW Student!'
+            },
+            'USYD': {
+                name: 'University of Sydney',
+                displayName: '悉尼大学 (USYD)',
+                domains: ['sydney.edu.au', 'uni.sydney.edu.au'],
+                color: '#E14532', // USYD Red approximation
+                welcome: 'Welcome, USYD Scholar!'
+            },
+            'Monash': {
+                name: 'Monash University',
+                displayName: '莫纳什大学 (Monash)',
+                domains: ['monash.edu', 'student.monash.edu'],
+                color: '#006DAE',
+                welcome: 'Hello Monash!'
+            },
+            'UniMelb': {
+                name: 'University of Melbourne',
+                displayName: '墨尔本大学 (UniMelb)',
+                domains: ['student.unimelb.edu.au', 'unimelb.edu.au'],
+                color: '#094183',
+                welcome: 'Greetings from Melbourne U'
+            }
+        };
+
+        // State
+        let isLoginMode = true;
+        let isStudentMode = true;
+        let countdownTimer = null;
+
+        // Elements
+        const formTitle = document.getElementById('form-title');
+        const formSubtitle = document.getElementById('form-subtitle');
+        const submitBtn = document.getElementById('submit-btn');
+        const switchText = document.getElementById('switch-text');
+        const switchBtn = document.getElementById('switch-btn');
+        const toggleTextBtn = document.getElementById('toggle-text-btn');
+        const verifyContainer = document.getElementById('verify-container');
+        const verifyInput = document.getElementById('verify-code');
+        const schoolBadge = document.getElementById('school-badge');
+        const schoolNameBadge = document.getElementById('school-name-badge');
+        const schoolNameHeader = document.getElementById('school-name-header');
+        
+        // Initialize Dropdown
+        function initDropdown() {
+            // Global School Selection
+            const schoolSelect = document.getElementById('school-select');
+            schoolSelect.innerHTML = '<option value="" disabled selected>请选择学校</option>';
+            
+            for (const key in SCHOOLS) {
+                const school = SCHOOLS[key];
+                
+                // Populate Global School Dropdown
+                const option = document.createElement('option');
+                option.value = key;
+                option.innerText = school.displayName;
+                schoolSelect.appendChild(option);
+            }
+        }
+
+        // Functions
+        function onSchoolSelect() {
+            const schoolKey = document.getElementById('school-select').value;
+            const school = SCHOOLS[schoolKey];
+            const emailContainer = document.getElementById('email-input-container');
+            const domainSelect = document.getElementById('email-domain');
+            const studentHint = document.getElementById('student-hint');
+            
+            if (school) {
+                // Update UI Theme
+                updateSchoolTheme(school);
+                
+                // Populate Email Domains (for Students)
+                domainSelect.innerHTML = ''; 
+                school.domains.forEach(domain => {
+                    const option = document.createElement('option');
+                    option.value = domain;
+                    option.innerText = '@' + domain;
+                    domainSelect.appendChild(option);
+                });
+                
+                // Show Email Input for Students
+                if (emailContainer) {
+                    emailContainer.classList.remove('hidden');
+                    emailContainer.classList.add('flex');
+                }
+                if (studentHint) studentHint.classList.add('hidden');
+            }
+        }
+
+        function updateSchoolTheme(school) {
+            // Update UI with School Info
+            schoolBadge.classList.remove('hidden');
+            schoolNameBadge.innerText = school.name;
+            
+            // Update welcome message if in login mode
+            if (isLoginMode) {
+                formSubtitle.innerText = school.welcome;
+            }
+        }
+
+        function toggleUserType() {
+            const radios = document.getElementsByName('userType');
+            let selectedType;
+            for (const radio of radios) {
+                if (radio.checked) {
+                    selectedType = radio.value;
+                    break;
+                }
+            }
+            
+            isStudentMode = (selectedType === 'student');
+            
+            const studentGroup = document.getElementById('student-email-group');
+            const alumniGroup = document.getElementById('alumni-email-group');
+            
+            if (isStudentMode) {
+                studentGroup.classList.remove('hidden');
+                alumniGroup.classList.add('hidden');
+            } else {
+                studentGroup.classList.add('hidden');
+                alumniGroup.classList.remove('hidden');
+            }
+            
+            // Note: We don't hide school badge anymore as school select is global
+            // But we might want to update welcome text logic if needed
+        }
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            
+            const alumniSchoolSelect = document.getElementById('alumni-school-select');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+
+            // Update UI Text
+            if (isLoginMode) {
+                formTitle.innerText = 'Agent Login';
+                formSubtitle.innerText = 'Hey, Enter your details to get sign in to your account';
+                submitBtn.innerText = 'Sign in';
+                switchText.innerText = "Don't have an account?";
+                switchBtn.innerText = 'Sign up';
+                if (toggleTextBtn) toggleTextBtn.innerText = 'Sign up';
+                
+                // Hide Verify Code
+                verifyContainer.classList.add('hidden');
+                verifyInput.required = false;
+                
+                // Show Forgot Password
+                if (forgotPasswordLink) forgotPasswordLink.classList.remove('hidden');
+                
+                // Hide Alumni School Select in Login Mode
+                if (alumniSchoolSelect) alumniSchoolSelect.classList.add('hidden');
+                
+                // Restore theme if school is selected
+                const schoolKey = document.getElementById('school-select').value;
+                if (schoolKey && SCHOOLS[schoolKey]) {
+                    updateSchoolTheme(SCHOOLS[schoolKey]);
+                }
+                
+            } else {
+                formTitle.innerText = 'Create Account';
+                formSubtitle.innerText = 'Join your school community today';
+                submitBtn.innerText = 'Register';
+                switchText.innerText = "Already have an account?";
+                switchBtn.innerText = 'Sign in';
+                if (toggleTextBtn) toggleTextBtn.innerText = 'Sign in';
+                
+                // Show Verify Code
+                verifyContainer.classList.remove('hidden');
+                verifyInput.required = true;
+                
+                // Hide Forgot Password
+                if (forgotPasswordLink) forgotPasswordLink.classList.add('hidden');
+                
+                // Show Alumni School Select in Register Mode (if Alumni)
+                if (!isStudentMode && alumniSchoolSelect) {
+                    alumniSchoolSelect.classList.remove('hidden');
+                }
+            }
+        }
+
+        function togglePassword() {
+            const pwdInput = document.getElementById('password');
+            const btn = event.currentTarget;
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                btn.innerText = 'Show';
+            } else {
+                pwdInput.type = 'password';
+                btn.innerText = 'Hide';
+            }
+        }
+
+        function getFullEmail() {
+            if (isStudentMode) {
+                const username = document.getElementById('email-username').value;
+                const domain = document.getElementById('email-domain').value;
+                if (!username || !domain) return null;
+                return `${username}@${domain}`;
+            } else {
+                return document.getElementById('email-full').value;
+            }
+        }
+
+        function sendCode() {
+            const email = getFullEmail();
+            if (!email) {
+                alert('Please enter your username and select a school domain.');
+                return;
+            }
+            
+            // Check if it's a valid school email (optional validation step)
+            // For now, we simulate sending
+            
+            const btn = document.getElementById('send-code-btn');
+            if (btn.disabled) return;
+
+            // Start Countdown
+            let timeLeft = 60;
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            
+            alert(`Verification code sent to ${email}`);
+
+            btn.innerText = `${timeLeft}s`;
+            
+            countdownTimer = setInterval(() => {
+                timeLeft--;
+                btn.innerText = `${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdownTimer);
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.innerText = 'Send Code';
+                }
+            }, 1000);
+        }
+
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            // Global School Validation
+            const schoolKey = document.getElementById('school-select').value;
+            if (!schoolKey || !SCHOOLS[schoolKey]) {
+                alert('Please select your university.');
+                return;
+            }
+            
+            const email = getFullEmail();
+            const password = document.getElementById('password').value;
+            
+            if (!email) {
+                alert('Please complete the email fields.');
+                return;
+            }
+            
+            if (isLoginMode) {
+                console.log('Logging in with:', email, password);
+                alert('Login Request Submitted for ' + email + ` (at ${SCHOOLS[schoolKey].name})`);
+            } else {
+                const code = document.getElementById('verify-code').value;
+                console.log('Registering with:', email, password, code, schoolKey);
+                alert('Registration Request Submitted for ' + email + ` (at ${SCHOOLS[schoolKey].name})`);
+            }
+        }
+
+        // Run Init
+        initDropdown();
+    </script>
+</body>
+</html>
